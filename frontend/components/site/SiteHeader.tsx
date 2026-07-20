@@ -46,7 +46,23 @@ export default function SiteHeader() {
       </div>
 
       <header className="relative flex flex-wrap items-end justify-between gap-4 border-b-[3px] border-ink px-4 py-4 sm:px-6">
-        <Link href="/" className="flex items-baseline gap-2.5">
+        <Link href="/" className="flex items-center gap-2.5">
+          <svg width="36" height="36" viewBox="0 0 136 140" aria-hidden="true" className="shrink-0">
+            <defs>
+              <linearGradient id="amakuru-logo-rainbow" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#E24B4A" />
+                <stop offset="20%" stopColor="#EF9F27" />
+                <stop offset="40%" stopColor="#639922" />
+                <stop offset="60%" stopColor="#1D9E75" />
+                <stop offset="80%" stopColor="#378ADD" />
+                <stop offset="100%" stopColor="#7F77DD" />
+              </linearGradient>
+            </defs>
+            <rect x="20" y="22" width="96" height="96" rx="48" fill="url(#amakuru-logo-rainbow)" />
+            <path d="M 42 96 L 68 40 L 94 96" fill="none" stroke="#F4F1EA" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M 52 76 L 84 76" stroke="#F4F1EA" strokeWidth="6" strokeLinecap="round" />
+            <circle cx="94" cy="96" r="5.5" fill="#C4632B" />
+          </svg>
           <span className="font-display text-[32px] italic font-semibold sm:text-[38px]">Amakuru</span>
         </Link>
 
