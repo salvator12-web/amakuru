@@ -1,27 +1,31 @@
 "use client";
+export const dynamic = "force-dynamic";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase/client";
 import { useAuthUser } from "@/lib/hooks/useAuthUser";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+import type { LangKey } from "@/lib/i18n/translations";
 
 const STAFF_ROLES = ["Admin", "Editor", "Author"];
 
-const NAV_ITEMS = [
-  { href: "/admin/articles", label: "Articles" },
-  { href: "/admin/media", label: "Media Library" },
-  { href: "/admin/moderation", label: "Comment Moderation" },
+const NAV_ITEMS: { href: string; key: LangKey }[] = [
+  { href: "/admin/articles", key: "adminArticles" },
+  { href: "/admin/media", key: "adminMedia" },
+  { href: "/admin/moderation", key: "adminModeration" },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { profile, loading, firebaseUser } = useAuthUser();
+  const { t } = useLanguage();
   const pathname = usePathname();
 
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center text-sm text-muted">
-        Loading…
+        {t("adminLoading")}
       </div>
     );
   }
@@ -29,12 +33,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   if (!firebaseUser || !profile) {
     return (
       <div className="mx-auto max-w-md p-8 text-center">
-        <h1 className="font-display text-2xl font-semibold text-ink">Sign in required</h1>
-        <p className="mt-2 text-sm text-muted">
-          Sign in from the homepage first, then come back to the admin dashboard.
-        </p>
+        <h1 className="font-display text-2xl font-semibold text-ink">{t("adminSignInRequiredTitle")}</h1>
+        <p className="mt-2 text-sm text-muted">{t("adminSignInRequiredBody")}</p>
         <Link href="/" className="mt-4 inline-block rounded bg-teal px-4 py-2 text-sm font-semibold text-white">
-          Go to homepage
+          {t("adminGoToHomepage")}
         </Link>
       </div>
     );
@@ -43,10 +45,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   if (!STAFF_ROLES.includes(profile.role)) {
     return (
       <div className="mx-auto max-w-md p-8 text-center">
-        <h1 className="font-display text-2xl font-semibold text-ink">Not authorized</h1>
+        <h1 className="font-display text-2xl font-semibold text-ink">{t("adminNotAuthorizedTitle")}</h1>
         <p className="mt-2 text-sm text-muted">
-          Your account role (<strong>{profile.role}</strong>) doesn&apos;t have access to the
-          admin dashboard. Ask an Admin to change your role.
+          Your account role (<strong>{profile.role}</strong>) {t("adminNotAuthorizedBody")}
         </p>
       </div>
     );
@@ -57,7 +58,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <aside className="w-56 shrink-0 border-r border-line bg-white p-4">
         <div className="mb-6 px-2">
           <div className="font-display text-lg font-semibold text-ink">Amakuru</div>
-          <div className="text-xs text-muted">Admin dashboard</div>
+          <div className="text-xs text-muted">{t("adminDashboard")}</div>
         </div>
         <nav className="flex flex-col gap-1">
           {NAV_ITEMS.map((item) => {
@@ -70,7 +71,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   active ? "bg-brand-soft text-teal" : "text-charcoal hover:bg-papyrus"
                 }`}
               >
-                {item.label}
+                {t(item.key)}
               </Link>
             );
           })}
@@ -83,19 +84,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   : "text-charcoal hover:bg-papyrus"
               }`}
             >
-              Users &amp; Roles
+              {t("adminUsersRoles")}
             </Link>
           )}
         </nav>
         <div className="mt-8 border-t border-line px-2 pt-4 text-xs text-muted">
-          Signed in as
+          {t("adminSignedInAs")}
           <div className="mt-1 font-medium text-charcoal">{profile.name}</div>
           <div>{profile.role}</div>
           <button
             onClick={() => signOut(auth)}
             className="mt-3 w-full rounded border border-ink px-3 py-1.5 text-xs font-semibold text-ink hover:bg-ink hover:text-white"
           >
-            Sign out
+            {t("adminSignOut")}
           </button>
         </div>
       </aside>
