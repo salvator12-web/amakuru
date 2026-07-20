@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 interface SectionHeadProps {
   label: string;
@@ -7,6 +10,7 @@ interface SectionHeadProps {
 }
 
 export default function SectionHead({ label, dotColor = "#2F6F5E", seeAllHref }: SectionHeadProps) {
+  const { t } = useLanguage();
   return (
     <div className="mb-6 flex items-center justify-between border-b-2 border-ink pb-2.5">
       <div className="flex items-center gap-2.5">
@@ -23,7 +27,7 @@ export default function SectionHead({ label, dotColor = "#2F6F5E", seeAllHref }:
           href={seeAllHref}
           className="font-mono text-[11px] uppercase tracking-wide text-muted hover:text-amber-deep"
         >
-          See all →
+          {t("seeAll")}
         </Link>
       )}
     </div>

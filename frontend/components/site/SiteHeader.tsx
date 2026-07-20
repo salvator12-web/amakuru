@@ -5,13 +5,15 @@ import Link from "next/link";
 import { useAuthUser } from "@/lib/hooks/useAuthUser";
 import AuthModal from "@/components/AuthModal";
 import LanguageSwitcher from "@/components/site/LanguageSwitcher";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+import type { LangKey } from "@/lib/i18n/translations";
 
-const NAV_LINKS = [
-  { href: "/", label: "Home" },
-  { href: "/category/politics", label: "Politics" },
-  { href: "/category/business", label: "Business" },
-  { href: "/category/culture", label: "Culture" },
-  { href: "/category/sport", label: "Sport" },
+const NAV_LINKS: { href: string; key: LangKey }[] = [
+  { href: "/", key: "home" },
+  { href: "/category/politics", key: "politics" },
+  { href: "/category/business", key: "business" },
+  { href: "/category/culture", key: "culture" },
+  { href: "/category/sport", key: "sport" },
 ];
 
 function initials(name?: string | null) {
@@ -26,6 +28,7 @@ function initials(name?: string | null) {
 
 export default function SiteHeader() {
   const { profile, firebaseUser, loading } = useAuthUser();
+  const { t } = useLanguage();
   const [menuOpen, setMenuOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const today = new Date().toLocaleDateString("en-GB", {
@@ -42,7 +45,7 @@ export default function SiteHeader() {
       <div className="flex items-center justify-between bg-ink px-4 py-1.5 text-[12.5px] text-[#EDE9DD] sm:px-6">
         <span className="font-mono opacity-80">{today}</span>
         <span className="hidden font-mono text-[11px] text-[#B9B4A2] sm:inline">
-          Great Lakes region, in three voices
+          {t("tagline")}
         </span>
       </div>
 
@@ -83,7 +86,7 @@ export default function SiteHeader() {
               onClick={() => setMenuOpen(false)}
               className="w-full border-b border-line py-2.5 text-sm font-semibold text-charcoal hover:text-amber-deep sm:w-auto sm:border-0 sm:border-b-2 sm:border-transparent sm:py-0 sm:pb-1 sm:hover:border-amber"
             >
-              {link.label}
+              {t(link.key)}
             </Link>
           ))}
 
@@ -100,7 +103,7 @@ export default function SiteHeader() {
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-teal font-display text-[11px] font-semibold text-white">
                 {initials(profile?.name || firebaseUser?.displayName)}
               </span>
-              {profile?.name || firebaseUser?.displayName || "Account"}
+              {profile?.name || firebaseUser?.displayName || t("account")}
             </Link>
           ) : (
             <button
@@ -110,7 +113,7 @@ export default function SiteHeader() {
               }}
               className="mt-2 rounded border border-ink px-4 py-2 text-[13px] font-semibold text-ink hover:bg-ink hover:text-white sm:mt-0"
             >
-              Sign in
+              {t("signIn")}
             </button>
           )}
         </nav>
@@ -120,7 +123,7 @@ export default function SiteHeader() {
           aria-expanded={menuOpen}
           className="rounded border border-ink px-3 py-2 font-mono text-[13px] font-bold text-ink sm:hidden"
         >
-          {menuOpen ? "✕ Close" : "☰ Menu"}
+          {menuOpen ? t("closeMenu") : t("menu")}
         </button>
       </header>
 

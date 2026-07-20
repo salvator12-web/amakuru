@@ -2,25 +2,19 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Globe } from "lucide-react";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 import type { SupportedLanguage } from "@/lib/types";
 
 const LANGUAGES: { code: SupportedLanguage; label: string; short: string }[] = [
   { code: "en", label: "English", short: "EN" },
   { code: "fr", label: "Français", short: "FR" },
-  { code: "rn", label: "Ikinyarwanda", short: "RN" },
+  { code: "rn", label: "Ikirundi", short: "RN" },
 ];
 
-const STORAGE_KEY = "amakuru_lang";
-
 export default function LanguageSwitcher() {
+  const { language, setLanguage } = useLanguage();
   const [open, setOpen] = useState(false);
-  const [lang, setLang] = useState<SupportedLanguage>("en");
   const rootRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const saved = window.localStorage.getItem(STORAGE_KEY) as SupportedLanguage | null;
-    if (saved && LANGUAGES.some((l) => l.code === saved)) setLang(saved);
-  }, []);
 
   useEffect(() => {
     function onClickOutside(e: MouseEvent) {
@@ -31,16 +25,15 @@ export default function LanguageSwitcher() {
   }, []);
 
   function choose(code: SupportedLanguage) {
-    setLang(code);
-    window.localStorage.setItem(STORAGE_KEY, code);
-    document.cookie = `amakuru_lang=${code}; path=/; max-age=31536000`;
+    setLanguage(code);
     setOpen(false);
-    // NOTE: this only stores the reader's preference for now — article
-    // content itself is single-language until the backend's `title`/`dek`/
-    // `body` fields grow { en, fr, rn } variants (see Article.ts comment).
+    // NOTE: this switches all site chrome text (nav, buttons, tagline) via
+    // LanguageProvider's t(). Article content itself is still single-language
+    // until the backend's title/dek/body fields grow { en, fr, rn } variants
+    // (see the comment in backend/src/models/Article.ts).
   }
 
-  const current = LANGUAGES.find((l) => l.code === lang)!;
+  const current = LANGUAGES.find((l) => l.code === language)!;
 
   return (
     <div ref={rootRef} className="relative">
@@ -61,11 +54,11 @@ export default function LanguageSwitcher() {
               key={l.code}
               onClick={() => choose(l.code)}
               className={`flex w-full items-center justify-between px-3 py-2 text-left text-[13px] hover:bg-papyrus ${
-                l.code === lang ? "font-semibold text-ink" : "text-charcoal"
+                l.code === language ? "font-semibold text-ink" : "text-charcoal"
               }`}
             >
               {l.label}
-              {l.code === lang && <span aria-hidden="true">✓</span>}
+              {l.code === language && <span aria-hidden="true">✓</span>}
             </button>
           ))}
         </div>
