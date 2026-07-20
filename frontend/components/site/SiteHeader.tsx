@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useAuthUser } from "@/lib/hooks/useAuthUser";
 import AuthModal from "@/components/AuthModal";
+import LanguageSwitcher from "@/components/site/LanguageSwitcher";
 
 const NAV_LINKS = [
   { href: "/", label: "Home" },
@@ -66,6 +67,10 @@ export default function SiteHeader() {
           <span className="font-display text-[32px] italic font-semibold sm:text-[38px]">Amakuru</span>
         </Link>
 
+        <div className="hidden items-center sm:flex">
+          <LanguageSwitcher />
+        </div>
+
         <nav
           className={`${
             menuOpen ? "flex" : "hidden"
@@ -81,6 +86,10 @@ export default function SiteHeader() {
               {link.label}
             </Link>
           ))}
+
+          <div className="w-full border-b border-line py-2.5 sm:hidden">
+            <LanguageSwitcher />
+          </div>
 
           {isSignedIn ? (
             <Link
