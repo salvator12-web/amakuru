@@ -62,7 +62,7 @@ export default function HomePage() {
 
         const featuredArticle = latest.find((a) => a.isFeatured) || latest[0] || null;
         setFeatured(featuredArticle);
-        setSidePicks(latest.filter((a) => a._id !== featuredArticle?._id).slice(0, 4));
+        setSidePicks(latest.filter((a) => a._id !== featuredArticle?._id).slice(0, 2));
 
         // Pull one section's worth of articles per category (first 3 categories).
         const sectionsToShow = cats.slice(0, 3);
@@ -147,13 +147,32 @@ export default function HomePage() {
             <div className="flex flex-col gap-5 border-t border-line pt-5 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0">
               <h2 className="font-mono text-[11px] uppercase tracking-wide text-muted">Also today</h2>
               {sidePicks.map((a) => (
-                <Link key={a._id} href={`/articles/${a.slug}`} className="group block border-b border-line pb-4 last:border-0">
-                  <span className="mb-1 block font-mono text-[10px] uppercase tracking-wide text-teal">
-                    {a.category?.name || "Amakuru"}
-                  </span>
-                  <h3 className="text-[15px] font-semibold leading-snug text-ink group-hover:text-amber-deep">
-                    {a.title}
-                  </h3>
+                <Link
+                  key={a._id}
+                  href={`/articles/${a.slug}`}
+                  className="group flex gap-3 border-b border-line pb-4 last:border-0 sm:gap-4"
+                >
+                  <div className="hidden h-20 w-28 shrink-0 overflow-hidden rounded-sm bg-papyrus sm:block">
+                    {a.coverImage?.secureUrl && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={a.coverImage.secureUrl}
+                        alt={a.coverImage.altText || a.title}
+                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                      />
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <span className="mb-1 block font-mono text-[10px] uppercase tracking-wide text-teal">
+                      {a.category?.name || "Amakuru"}
+                    </span>
+                    <h3 className="text-[15px] font-semibold leading-snug text-ink group-hover:text-amber-deep">
+                      {a.title}
+                    </h3>
+                    <p className="mt-1 hidden text-[13px] leading-snug text-charcoal sm:line-clamp-2 sm:block">
+                      {a.dek}
+                    </p>
+                  </div>
                 </Link>
               ))}
             </div>
