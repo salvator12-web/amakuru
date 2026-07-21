@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useAuthUser } from "@/lib/hooks/useAuthUser";
 import ArticleForm, { type ArticleFormValues } from "@/components/admin/ArticleForm";
+import RequireRole from "@/components/admin/RequireRole";
 
 export default function EditArticlePage() {
   const { id } = useParams<{ id: string }>();
@@ -40,13 +41,18 @@ export default function EditArticlePage() {
     })();
   }, [authedFetch, id]);
 
-  if (loading) return <p className="text-sm text-muted">Loading…</p>;
-  if (notFound || !initial) return <p className="text-sm text-red-600">Article not found.</p>;
-
   return (
-    <div>
-      <h1 className="mb-6 font-display text-2xl font-semibold text-ink">Edit article</h1>
-      <ArticleForm initial={initial} />
-    </div>
+    <RequireRole roles={["Editor", "Author"]}>
+      {loading ? (
+        <p className="text-sm text-muted">Loading…</p>
+      ) : notFound || !initial ? (
+        <p className="text-sm text-red-600">Article not found.</p>
+      ) : (
+        <div>
+          <h1 className="mb-6 font-display text-2xl font-semibold text-ink">Edit article</h1>
+          <ArticleForm initial={initial} />
+        </div>
+      )}
+    </RequireRole>
   );
 }
