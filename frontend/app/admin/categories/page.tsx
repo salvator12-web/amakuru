@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useAuthUser } from "@/lib/hooks/useAuthUser";
+import RequireRole from "@/components/admin/RequireRole";
 import { Plus, Trash2 } from "lucide-react";
 
 interface Category {
@@ -95,6 +96,7 @@ export default function CategoriesPage() {
   }
 
   return (
+    <RequireRole roles={["Editor"]}>
     <div>
       <div className="mb-6">
         <h1 className="font-display text-2xl font-semibold text-ink">Categories &amp; Tags</h1>
@@ -187,5 +189,6 @@ export default function CategoriesPage() {
         </div>
       </div>
     </div>
+    </RequireRole>
   );
 }
