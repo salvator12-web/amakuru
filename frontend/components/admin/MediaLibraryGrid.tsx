@@ -106,7 +106,7 @@ export default function MediaLibraryGrid({
                 <button
                   disabled={busyId === item._id}
                   onClick={() => saveAltText(item._id)}
-                  className="rounded bg-teal px-2 text-white"
+                  className="rounded bg-adminOrange px-2 text-adminNavy"
                 >
                   Save
                 </button>
@@ -118,7 +118,7 @@ export default function MediaLibraryGrid({
             {mode === "pick" ? (
               <button
                 onClick={() => onPick?.(item)}
-                className="mt-1 w-full rounded bg-teal px-2 py-1 text-xs font-semibold text-white hover:bg-brand-dark"
+                className="mt-1 w-full rounded bg-adminOrange px-2 py-1 text-xs font-semibold text-adminNavy hover:bg-adminOrange-dark"
               >
                 Select
               </button>
@@ -129,7 +129,7 @@ export default function MediaLibraryGrid({
                     setEditingId(item._id);
                     setAltDraft(item.altText || "");
                   }}
-                  className="text-teal hover:underline"
+                  className="text-adminOrange-dark hover:underline"
                 >
                   Edit alt
                 </button>

@@ -85,7 +85,7 @@ export default function MediaUploader({ onUploaded }: MediaUploaderProps) {
           type="button"
           disabled={uploading}
           onClick={() => inputRef.current?.click()}
-          className="rounded bg-teal px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-50"
+          className="rounded bg-adminOrange px-4 py-2 text-sm font-semibold text-adminNavy hover:bg-adminOrange-dark disabled:opacity-50"
         >
           {uploading ? "Uploading…" : "Upload media"}
         </button>

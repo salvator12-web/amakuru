@@ -228,7 +228,7 @@ export default function ArticleForm({ initial }: ArticleFormProps) {
               onClick={() => toggleTag(t._id)}
               className={`rounded-full border px-3 py-1 text-xs ${
                 values.tags.includes(t._id)
-                  ? "border-teal bg-brand-soft text-teal"
+                  ? "border-adminOrange bg-adminOrange-soft text-adminOrange-dark"
                   : "border-line text-muted"
               }`}
             >
@@ -271,7 +271,7 @@ export default function ArticleForm({ initial }: ArticleFormProps) {
             type="button"
             disabled={saving}
             onClick={(e) => handleSubmit(e, "published")}
-            className="rounded bg-teal px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-50"
+            className="rounded bg-adminOrange px-4 py-2 text-sm font-semibold text-adminNavy hover:bg-adminOrange-dark disabled:opacity-50"
           >
             Save &amp; publish
           </button>
