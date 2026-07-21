@@ -64,7 +64,7 @@ export default function SettingsPage() {
           <input
             value={settings.siteName ?? ""}
             onChange={(e) => setSettings({ ...settings, siteName: e.target.value })}
-            className="w-full rounded border border-line bg-papyrus/20 px-3 py-2.5 text-[13.5px] text-ink outline-none focus:border-teal"
+            className="w-full rounded border border-line bg-papyrus/20 px-3 py-2.5 text-[13.5px] text-ink outline-none focus:border-adminOrange"
           />
         </div>
         <div>
@@ -72,7 +72,7 @@ export default function SettingsPage() {
           <input
             value={settings.tagline ?? ""}
             onChange={(e) => setSettings({ ...settings, tagline: e.target.value })}
-            className="w-full rounded border border-line bg-papyrus/20 px-3 py-2.5 text-[13.5px] text-ink outline-none focus:border-teal"
+            className="w-full rounded border border-line bg-papyrus/20 px-3 py-2.5 text-[13.5px] text-ink outline-none focus:border-adminOrange"
           />
         </div>
         <div>
@@ -81,7 +81,7 @@ export default function SettingsPage() {
             type="email"
             value={settings.contactEmail ?? ""}
             onChange={(e) => setSettings({ ...settings, contactEmail: e.target.value })}
-            className="w-full rounded border border-line bg-papyrus/20 px-3 py-2.5 text-[13.5px] text-ink outline-none focus:border-teal"
+            className="w-full rounded border border-line bg-papyrus/20 px-3 py-2.5 text-[13.5px] text-ink outline-none focus:border-adminOrange"
           />
         </div>
 
@@ -107,11 +107,11 @@ export default function SettingsPage() {
           <button
             type="submit"
             disabled={saving}
-            className="rounded bg-teal px-4 py-2.5 text-sm font-bold text-white hover:bg-brand-dark disabled:opacity-60"
+            className="rounded bg-adminOrange px-4 py-2.5 text-sm font-bold text-adminNavy hover:bg-adminOrange-dark disabled:opacity-60"
           >
             {saving ? "Saving…" : "Save settings"}
           </button>
-          {saved && <span className="text-xs font-semibold text-teal">Saved.</span>}
+          {saved && <span className="text-xs font-semibold text-adminOrange-dark">Saved.</span>}
         </div>
       </form>
     </div>
