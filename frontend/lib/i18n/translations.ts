@@ -43,6 +43,13 @@ export type LangKey =
   | "adminArticles"
   | "adminMedia"
   | "adminModeration"
+  | "adminCategories"
+  | "adminAds"
+  | "adminNewsletter"
+  | "adminNotifications"
+  | "adminAnalytics"
+  | "adminAuditLog"
+  | "adminSettings"
   | "adminUsersRoles"
   | "adminSignedInAs"
   | "adminSignOut"
@@ -96,6 +103,13 @@ export const translations: Record<"en" | "fr" | "rn", Record<LangKey, string>> =
     adminArticles: "Articles",
     adminMedia: "Media Library",
     adminModeration: "Comment Moderation",
+    adminCategories: "Categories & Tags",
+    adminAds: "Advertisements",
+    adminNewsletter: "Newsletter",
+    adminNotifications: "Notifications",
+    adminAnalytics: "Analytics",
+    adminAuditLog: "Audit Log",
+    adminSettings: "Site Settings",
     adminUsersRoles: "Users & Roles",
     adminSignedInAs: "Signed in as",
     adminSignOut: "Sign out",
@@ -148,6 +162,13 @@ export const translations: Record<"en" | "fr" | "rn", Record<LangKey, string>> =
     adminArticles: "Articles",
     adminMedia: "Médiathèque",
     adminModeration: "Modération des commentaires",
+    adminCategories: "Catégories & étiquettes",
+    adminAds: "Publicités",
+    adminNewsletter: "Newsletter",
+    adminNotifications: "Notifications",
+    adminAnalytics: "Statistiques",
+    adminAuditLog: "Journal d'audit",
+    adminSettings: "Paramètres du site",
     adminUsersRoles: "Utilisateurs & rôles",
     adminSignedInAs: "Connecté en tant que",
     adminSignOut: "Se déconnecter",
@@ -200,6 +221,13 @@ export const translations: Record<"en" | "fr" | "rn", Record<LangKey, string>> =
     adminArticles: "Inyandiko",
     adminMedia: "Ububiko bw'ibicishije",
     adminModeration: "Ugucungura ivyavuzwe",
+    adminCategories: "Ibyiciro & Uduhinga",
+    adminAds: "Amatangazo",
+    adminNewsletter: "Newsletter",
+    adminNotifications: "Ubumenyesha",
+    adminAnalytics: "Isesengura",
+    adminAuditLog: "Urutonde rw'ivyakozwe",
+    adminSettings: "Igenamiterere ry'urubuga",
     adminUsersRoles: "Abakoresha & Inzego",
     adminSignedInAs: "Winjiye nka",
     adminSignOut: "Sohoka",
