@@ -80,8 +80,8 @@ export default function UsersPage() {
   return (
     <RequireRole roles={[]}>
     <div>
-      <h1 className="font-display text-2xl font-semibold text-ink">Users &amp; Roles</h1>
-      <p className="mt-1 text-sm text-muted">
+      <h1 className="font-display text-2xl font-semibold text-adminNavy">Users &amp; Roles</h1>
+      <p className="mt-1 text-sm text-gray-500">
         Promote a facilitator to Editor or Author once they&apos;ve signed in at least once —
         new accounts start as <strong>Subscriber</strong> until you upgrade them here.
       </p>
@@ -89,16 +89,16 @@ export default function UsersPage() {
       {error && <p className="mt-4 rounded bg-red-50 p-3 text-sm text-red-700">{error}</p>}
 
       {loading ? (
-        <p className="mt-6 text-sm text-muted">Loading…</p>
+        <p className="mt-6 text-sm text-gray-500">Loading…</p>
       ) : users.length === 0 ? (
-        <p className="mt-6 text-sm text-muted">
+        <p className="mt-6 text-sm text-gray-500">
           No one has signed in yet. Ask your facilitator to sign in on the site first — once
           they do, they&apos;ll show up here as a Subscriber, ready to promote.
         </p>
       ) : (
         <table className="mt-6 w-full max-w-3xl border-collapse text-sm">
           <thead>
-            <tr className="border-b border-line text-left text-xs uppercase tracking-wide text-muted">
+            <tr className="border-b border-gray-200 text-left text-xs uppercase tracking-wide text-gray-500">
               <th className="py-2 pr-4">Name</th>
               <th className="py-2 pr-4">Email</th>
               <th className="py-2 pr-4">Role</th>
@@ -107,15 +107,15 @@ export default function UsersPage() {
           </thead>
           <tbody>
             {users.map((u) => (
-              <tr key={u._id} className="border-b border-line/60">
-                <td className="py-2 pr-4 font-medium text-charcoal">{u.name}</td>
-                <td className="py-2 pr-4 text-muted">{u.email}</td>
+              <tr key={u._id} className="border-b border-gray-200/60">
+                <td className="py-2 pr-4 font-medium text-adminNavy">{u.name}</td>
+                <td className="py-2 pr-4 text-gray-500">{u.email}</td>
                 <td className="py-2 pr-4">
                   <select
                     value={u.role}
                     disabled={savingId === u._id}
                     onChange={(e) => updateRole(u._id, e.target.value as UserRole)}
-                    className="rounded border border-line px-2 py-1 text-sm disabled:opacity-50"
+                    className="rounded border border-gray-200 px-2 py-1 text-sm disabled:opacity-50"
                   >
                     {ROLES.map((r) => (
                       <option key={r} value={r}>
@@ -129,7 +129,7 @@ export default function UsersPage() {
                     value={u.status}
                     disabled={savingId === u._id}
                     onChange={(e) => updateStatus(u._id, e.target.value as UserStatus)}
-                    className="rounded border border-line px-2 py-1 text-sm disabled:opacity-50"
+                    className="rounded border border-gray-200 px-2 py-1 text-sm disabled:opacity-50"
                   >
                     <option value="active">active</option>
                     <option value="invited">invited</option>
