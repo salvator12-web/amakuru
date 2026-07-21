@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useAuthUser } from "@/lib/hooks/useAuthUser";
+import RequireRole from "@/components/admin/RequireRole";
 
 interface SiteSettings {
   siteName?: string;
@@ -50,6 +51,7 @@ export default function SettingsPage() {
   if (loading) return <p className="text-sm text-muted">Loading…</p>;
 
   return (
+    <RequireRole roles={[]}>
     <div className="max-w-2xl">
       <div className="mb-6">
         <h1 className="font-display text-2xl font-semibold text-ink">Settings</h1>
@@ -113,6 +115,7 @@ export default function SettingsPage() {
         </div>
       </form>
     </div>
+    </RequireRole>
   );
 }
 
