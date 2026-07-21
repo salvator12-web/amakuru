@@ -19,7 +19,7 @@ interface ArticleRow {
 const STATUS_STYLES: Record<string, string> = {
   draft: "bg-gray-100 text-gray-700",
   scheduled: "bg-amber/20 text-amber-deep",
-  published: "bg-brand-soft text-teal",
+  published: "bg-adminOrange-soft text-adminOrange-dark",
 };
 
 export default function AdminArticlesPage() {
@@ -59,7 +59,7 @@ export default function AdminArticlesPage() {
         </div>
         <Link
           href="/admin/articles/new"
-          className="rounded bg-teal px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark"
+          className="rounded bg-adminOrange px-4 py-2 text-sm font-semibold text-adminNavy hover:bg-adminOrange-dark"
         >
           + New article
         </Link>
@@ -71,7 +71,7 @@ export default function AdminArticlesPage() {
             key={s || "all"}
             onClick={() => setStatusFilter(s)}
             className={`rounded-full border px-3 py-1 text-xs capitalize ${
-              statusFilter === s ? "border-teal bg-brand-soft text-teal" : "border-line text-muted"
+              statusFilter === s ? "border-adminOrange bg-adminOrange-soft text-adminOrange-dark" : "border-line text-muted"
             }`}
           >
             {s || "All"}
@@ -106,7 +106,7 @@ export default function AdminArticlesPage() {
                   </span>
                 </td>
                 <td className="space-x-3 py-2 text-right">
-                  <Link href={`/admin/articles/${a._id}`} className="text-teal hover:underline">
+                  <Link href={`/admin/articles/${a._id}`} className="text-adminOrange-dark hover:underline">
                     Edit
                   </Link>
                   <button onClick={() => handleDelete(a._id)} className="text-red-600 hover:underline">
