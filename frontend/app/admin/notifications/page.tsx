@@ -70,30 +70,30 @@ export default function NotificationsPage() {
     <RequireRole roles={["Editor"]}>
     <div>
       <div className="mb-6">
-        <h1 className="font-display text-2xl font-semibold text-ink">Notifications</h1>
-        <p className="mt-1 text-sm text-muted">Compose push notifications and review what&apos;s gone out.</p>
+        <h1 className="font-display text-2xl font-semibold text-adminNavy">Notifications</h1>
+        <p className="mt-1 text-sm text-gray-500">Compose push notifications and review what&apos;s gone out.</p>
       </div>
 
-      <div className="mb-5 overflow-hidden rounded-[10px] border border-line bg-white">
-        <div className="border-b border-line px-5 py-4">
-          <h2 className="text-sm font-bold text-ink">New notification</h2>
+      <div className="mb-5 overflow-hidden rounded-[10px] border border-gray-200 bg-white">
+        <div className="border-b border-gray-200 px-5 py-4">
+          <h2 className="text-sm font-bold text-adminNavy">New notification</h2>
         </div>
         <form onSubmit={handleSend} className="grid gap-4 p-5 md:grid-cols-[2fr_1fr_auto] md:items-end">
           <div>
-            <label className="mb-1.5 block text-xs font-bold text-ink">Title</label>
+            <label className="mb-1.5 block text-xs font-bold text-adminNavy">Title</label>
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Breaking: election commission announcement"
-              className="w-full rounded border border-line bg-papyrus/20 px-3 py-2.5 text-[13.5px] text-ink outline-none focus:border-adminOrange"
+              className="w-full rounded border border-gray-200 bg-gray-50 px-3 py-2.5 text-[13.5px] text-adminNavy outline-none focus:border-adminOrange"
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-xs font-bold text-ink">Audience</label>
+            <label className="mb-1.5 block text-xs font-bold text-adminNavy">Audience</label>
             <select
               value={audience}
               onChange={(e) => setAudience(e.target.value as typeof audience)}
-              className="w-full rounded border border-line bg-papyrus/20 px-3 py-2.5 text-[13.5px] text-ink outline-none focus:border-adminOrange"
+              className="w-full rounded border border-gray-200 bg-gray-50 px-3 py-2.5 text-[13.5px] text-adminNavy outline-none focus:border-adminOrange"
             >
               <option value="all">All users</option>
               <option value="category-subscribers">Category subscribers</option>
@@ -108,31 +108,31 @@ export default function NotificationsPage() {
             {sending ? "Saving…" : "Save & send"}
           </button>
           <div className="md:col-span-3">
-            <label className="mb-1.5 block text-xs font-bold text-ink">Message</label>
+            <label className="mb-1.5 block text-xs font-bold text-adminNavy">Message</label>
             <textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Short summary shown in the push notification"
               rows={2}
-              className="w-full resize-y rounded border border-line bg-papyrus/20 px-3 py-2.5 text-[13.5px] text-ink outline-none focus:border-adminOrange"
+              className="w-full resize-y rounded border border-gray-200 bg-gray-50 px-3 py-2.5 text-[13.5px] text-adminNavy outline-none focus:border-adminOrange"
             />
           </div>
           {error && <p className="text-xs text-red-600 md:col-span-3">{error}</p>}
         </form>
       </div>
 
-      <div className="overflow-hidden rounded-[10px] border border-line bg-white">
-        <div className="border-b border-line px-5 py-4">
-          <h2 className="text-sm font-bold text-ink">History</h2>
+      <div className="overflow-hidden rounded-[10px] border border-gray-200 bg-white">
+        <div className="border-b border-gray-200 px-5 py-4">
+          <h2 className="text-sm font-bold text-adminNavy">History</h2>
         </div>
         {loading ? (
-          <p className="p-5 text-sm text-muted">Loading…</p>
+          <p className="p-5 text-sm text-gray-500">Loading…</p>
         ) : history.length === 0 ? (
-          <p className="p-5 text-sm text-muted">No notifications sent yet.</p>
+          <p className="p-5 text-sm text-gray-500">No notifications sent yet.</p>
         ) : (
           <table className="w-full border-collapse text-sm">
             <thead>
-              <tr className="bg-papyrus/30 text-left text-[10.5px] font-bold uppercase tracking-wide text-muted">
+              <tr className="bg-gray-50 text-left text-[10.5px] font-bold uppercase tracking-wide text-gray-500">
                 <th className="px-5 py-2.5">Notification</th>
                 <th className="px-5 py-2.5">Audience</th>
                 <th className="px-5 py-2.5">Reach</th>
@@ -141,15 +141,15 @@ export default function NotificationsPage() {
             </thead>
             <tbody>
               {history.map((n) => (
-                <tr key={n._id} className="border-t border-line">
+                <tr key={n._id} className="border-t border-gray-200">
                   <td className="px-5 py-3">
-                    <div className="font-semibold text-ink">{n.title}</div>
-                    <div className="text-xs text-muted">
+                    <div className="font-semibold text-adminNavy">{n.title}</div>
+                    <div className="text-xs text-gray-500">
                       {n.message} — {new Date(n.createdAt).toLocaleString()}
                     </div>
                   </td>
-                  <td className="px-5 py-3 text-muted">{n.audience.replace(/-/g, " ")}</td>
-                  <td className="px-5 py-3 font-mono text-xs text-muted">
+                  <td className="px-5 py-3 text-gray-500">{n.audience.replace(/-/g, " ")}</td>
+                  <td className="px-5 py-3 font-mono text-xs text-gray-500">
                     {n.deliveryStats?.estimatedReach?.toLocaleString() ?? "—"}
                   </td>
                   <td className="px-5 py-3">
