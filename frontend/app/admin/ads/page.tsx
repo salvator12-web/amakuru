@@ -101,7 +101,7 @@ export default function AdsPage() {
             <input
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
-              className="w-full rounded border border-line bg-papyrus/20 px-3 py-2.5 text-[13.5px] text-ink outline-none focus:border-teal"
+              className="w-full rounded border border-line bg-papyrus/20 px-3 py-2.5 text-[13.5px] text-ink outline-none focus:border-adminOrange"
             />
           </div>
           <div>
@@ -109,7 +109,7 @@ export default function AdsPage() {
             <select
               value={form.placement}
               onChange={(e) => setForm({ ...form, placement: e.target.value as Ad["placement"] })}
-              className="w-full rounded border border-line bg-papyrus/20 px-3 py-2.5 text-[13.5px] text-ink outline-none focus:border-teal"
+              className="w-full rounded border border-line bg-papyrus/20 px-3 py-2.5 text-[13.5px] text-ink outline-none focus:border-adminOrange"
             >
               {PLACEMENTS.map((p) => (
                 <option key={p} value={p}>
@@ -124,7 +124,7 @@ export default function AdsPage() {
               value={form.imageUrl}
               onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
               placeholder="https://…"
-              className="w-full rounded border border-line bg-papyrus/20 px-3 py-2.5 text-[13.5px] text-ink outline-none focus:border-teal"
+              className="w-full rounded border border-line bg-papyrus/20 px-3 py-2.5 text-[13.5px] text-ink outline-none focus:border-adminOrange"
             />
           </div>
           <div>
@@ -133,13 +133,13 @@ export default function AdsPage() {
               value={form.targetUrl}
               onChange={(e) => setForm({ ...form, targetUrl: e.target.value })}
               placeholder="https://…"
-              className="w-full rounded border border-line bg-papyrus/20 px-3 py-2.5 text-[13.5px] text-ink outline-none focus:border-teal"
+              className="w-full rounded border border-line bg-papyrus/20 px-3 py-2.5 text-[13.5px] text-ink outline-none focus:border-adminOrange"
             />
           </div>
           <button
             type="submit"
             disabled={creating}
-            className="inline-flex w-fit items-center gap-2 rounded bg-teal px-4 py-2.5 text-sm font-bold text-white hover:bg-brand-dark disabled:opacity-60"
+            className="inline-flex w-fit items-center gap-2 rounded bg-adminOrange px-4 py-2.5 text-sm font-bold text-adminNavy hover:bg-adminOrange-dark disabled:opacity-60"
           >
             <Plus size={14} /> {creating ? "Creating…" : "Create ad"}
           </button>
@@ -177,7 +177,7 @@ export default function AdsPage() {
                     <button
                       onClick={() => toggleActive(ad)}
                       className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${
-                        ad.active ? "bg-brand-soft text-teal" : "bg-gray-100 text-gray-600"
+                        ad.active ? "bg-adminOrange-soft text-adminOrange-dark" : "bg-gray-100 text-gray-600"
                       }`}
                     >
                       {ad.active ? "Active" : "Paused"}
