@@ -99,8 +99,8 @@ export default function CategoriesPage() {
     <RequireRole roles={["Editor"]}>
     <div>
       <div className="mb-6">
-        <h1 className="font-display text-2xl font-semibold text-ink">Categories &amp; Tags</h1>
-        <p className="mt-1 text-sm text-muted">Organize articles into sections and topic tags.</p>
+        <h1 className="font-display text-2xl font-semibold text-adminNavy">Categories &amp; Tags</h1>
+        <p className="mt-1 text-sm text-gray-500">Organize articles into sections and topic tags.</p>
       </div>
 
       {error && (
@@ -109,16 +109,16 @@ export default function CategoriesPage() {
 
       <div className="grid gap-5 lg:grid-cols-2">
         {/* Categories */}
-        <div className="overflow-hidden rounded-[10px] border border-line bg-white">
-          <div className="border-b border-line px-5 py-4">
-            <h2 className="text-sm font-bold text-ink">Categories</h2>
+        <div className="overflow-hidden rounded-[10px] border border-gray-200 bg-white">
+          <div className="border-b border-gray-200 px-5 py-4">
+            <h2 className="text-sm font-bold text-adminNavy">Categories</h2>
           </div>
-          <form onSubmit={addCategory} className="flex gap-2 border-b border-line p-4">
+          <form onSubmit={addCategory} className="flex gap-2 border-b border-gray-200 p-4">
             <input
               value={newCategoryName}
               onChange={(e) => setNewCategoryName(e.target.value)}
               placeholder="e.g. Politics"
-              className="flex-1 rounded border border-line bg-papyrus/20 px-3 py-2 text-sm text-ink outline-none focus:border-adminOrange"
+              className="flex-1 rounded border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-adminNavy outline-none focus:border-adminOrange"
             />
             <button
               type="submit"
@@ -128,18 +128,18 @@ export default function CategoriesPage() {
             </button>
           </form>
           {loading ? (
-            <p className="p-5 text-sm text-muted">Loading…</p>
+            <p className="p-5 text-sm text-gray-500">Loading…</p>
           ) : categories.length === 0 ? (
-            <p className="p-5 text-sm text-muted">No categories yet.</p>
+            <p className="p-5 text-sm text-gray-500">No categories yet.</p>
           ) : (
             <div>
               {categories.map((c) => (
-                <div key={c._id} className="flex items-center justify-between border-b border-line px-5 py-3 last:border-b-0">
+                <div key={c._id} className="flex items-center justify-between border-b border-gray-200 px-5 py-3 last:border-b-0">
                   <div>
-                    <div className="text-sm font-semibold text-ink">{c.name}</div>
-                    <div className="font-mono text-xs text-muted">/{c.slug}</div>
+                    <div className="text-sm font-semibold text-adminNavy">{c.name}</div>
+                    <div className="font-mono text-xs text-gray-500">/{c.slug}</div>
                   </div>
-                  <button onClick={() => deleteCategory(c._id)} className="text-muted hover:text-red-600" title="Delete">
+                  <button onClick={() => deleteCategory(c._id)} className="text-gray-500 hover:text-red-600" title="Delete">
                     <Trash2 size={15} />
                   </button>
                 </div>
@@ -149,16 +149,16 @@ export default function CategoriesPage() {
         </div>
 
         {/* Tags */}
-        <div className="overflow-hidden rounded-[10px] border border-line bg-white">
-          <div className="border-b border-line px-5 py-4">
-            <h2 className="text-sm font-bold text-ink">Tags</h2>
+        <div className="overflow-hidden rounded-[10px] border border-gray-200 bg-white">
+          <div className="border-b border-gray-200 px-5 py-4">
+            <h2 className="text-sm font-bold text-adminNavy">Tags</h2>
           </div>
-          <form onSubmit={addTag} className="flex gap-2 border-b border-line p-4">
+          <form onSubmit={addTag} className="flex gap-2 border-b border-gray-200 p-4">
             <input
               value={newTagName}
               onChange={(e) => setNewTagName(e.target.value)}
               placeholder="e.g. elections-2026"
-              className="flex-1 rounded border border-line bg-papyrus/20 px-3 py-2 text-sm text-ink outline-none focus:border-adminOrange"
+              className="flex-1 rounded border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-adminNavy outline-none focus:border-adminOrange"
             />
             <button
               type="submit"
@@ -168,18 +168,18 @@ export default function CategoriesPage() {
             </button>
           </form>
           {loading ? (
-            <p className="p-5 text-sm text-muted">Loading…</p>
+            <p className="p-5 text-sm text-gray-500">Loading…</p>
           ) : tags.length === 0 ? (
-            <p className="p-5 text-sm text-muted">No tags yet.</p>
+            <p className="p-5 text-sm text-gray-500">No tags yet.</p>
           ) : (
             <div className="flex flex-wrap gap-2 p-4">
               {tags.map((tg) => (
                 <span
                   key={tg._id}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-line bg-papyrus/20 px-3 py-1 text-xs font-semibold text-ink"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-xs font-semibold text-adminNavy"
                 >
                   {tg.name}
-                  <button onClick={() => deleteTag(tg._id)} className="text-muted hover:text-red-600">
+                  <button onClick={() => deleteTag(tg._id)} className="text-gray-500 hover:text-red-600">
                     <Trash2 size={12} />
                   </button>
                 </span>
