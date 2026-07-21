@@ -70,14 +70,14 @@ export default function MediaLibraryGrid({
   }
 
   if (items.length === 0) {
-    return <p className="text-sm text-muted">No media uploaded yet.</p>;
+    return <p className="text-sm text-gray-500">No media uploaded yet.</p>;
   }
 
   return (
     <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
       {items.map((item) => (
-        <div key={item._id} className="overflow-hidden rounded border border-line bg-white">
-          <div className="aspect-video w-full bg-papyrus">
+        <div key={item._id} className="overflow-hidden rounded border border-gray-200 bg-white">
+          <div className="aspect-video w-full bg-gray-100">
             {item.type === "image" ? (
               <img
                 src={item.secureUrl}
@@ -88,8 +88,8 @@ export default function MediaLibraryGrid({
               <video src={item.secureUrl} className="h-full w-full object-cover" muted />
             )}
           </div>
-          <div className="space-y-1 p-2 text-xs text-muted">
-            <div className="truncate font-medium text-charcoal">{item.publicId.split("/").pop()}</div>
+          <div className="space-y-1 p-2 text-xs text-gray-500">
+            <div className="truncate font-medium text-adminNavy">{item.publicId.split("/").pop()}</div>
             <div>
               {item.format.toUpperCase()} · {formatBytes(item.bytes)}
               {item.width && item.height ? ` · ${item.width}×${item.height}` : ""}
@@ -98,7 +98,7 @@ export default function MediaLibraryGrid({
             {editingId === item._id ? (
               <div className="flex gap-1">
                 <input
-                  className="w-full rounded border border-line px-1 py-0.5 text-xs"
+                  className="w-full rounded border border-gray-200 px-1 py-0.5 text-xs"
                   value={altDraft}
                   onChange={(e) => setAltDraft(e.target.value)}
                   placeholder="Alt text"

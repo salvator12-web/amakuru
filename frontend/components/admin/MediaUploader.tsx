@@ -97,7 +97,7 @@ export default function MediaUploader({ onUploaded }: MediaUploaderProps) {
           hidden
           onChange={(e) => handleFiles(e.target.files)}
         />
-        {progress && <span className="text-sm text-muted">{progress}</span>}
+        {progress && <span className="text-sm text-gray-500">{progress}</span>}
       </div>
       {error && <p className="text-sm text-red-600">{error}</p>}
     </div>

@@ -130,17 +130,17 @@ export default function ArticleForm({ initial }: ArticleFormProps) {
       {error && <p className="rounded bg-red-50 p-3 text-sm text-red-700">{error}</p>}
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-charcoal">Title</label>
+        <label className="mb-1 block text-sm font-medium text-adminNavy">Title</label>
         <input
           required
           value={values.title}
           onChange={(e) => updateTitle(e.target.value)}
-          className="w-full rounded border border-line px-3 py-2 text-sm"
+          className="w-full rounded border border-gray-200 px-3 py-2 text-sm"
         />
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-charcoal">Slug</label>
+        <label className="mb-1 block text-sm font-medium text-adminNavy">Slug</label>
         <input
           required
           value={values.slug}
@@ -148,41 +148,41 @@ export default function ArticleForm({ initial }: ArticleFormProps) {
             setSlugTouched(true);
             setValues((v) => ({ ...v, slug: e.target.value }));
           }}
-          className="w-full rounded border border-line px-3 py-2 text-sm font-mono"
+          className="w-full rounded border border-gray-200 px-3 py-2 text-sm font-mono"
         />
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-charcoal">Dek (short summary)</label>
+        <label className="mb-1 block text-sm font-medium text-adminNavy">Dek (short summary)</label>
         <textarea
           required
           rows={2}
           value={values.dek}
           onChange={(e) => setValues((v) => ({ ...v, dek: e.target.value }))}
-          className="w-full rounded border border-line px-3 py-2 text-sm"
+          className="w-full rounded border border-gray-200 px-3 py-2 text-sm"
         />
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-charcoal">Body</label>
+        <label className="mb-1 block text-sm font-medium text-adminNavy">Body</label>
         <textarea
           required
           rows={12}
           value={values.body}
           onChange={(e) => setValues((v) => ({ ...v, body: e.target.value }))}
-          className="w-full rounded border border-line px-3 py-2 font-mono text-sm"
+          className="w-full rounded border border-gray-200 px-3 py-2 font-mono text-sm"
           placeholder="HTML or Markdown — rendered on the public site"
         />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="mb-1 block text-sm font-medium text-charcoal">Category</label>
+          <label className="mb-1 block text-sm font-medium text-adminNavy">Category</label>
           <select
             required
             value={values.category}
             onChange={(e) => setValues((v) => ({ ...v, category: e.target.value }))}
-            className="w-full rounded border border-line px-3 py-2 text-sm"
+            className="w-full rounded border border-gray-200 px-3 py-2 text-sm"
           >
             <option value="">Select a category…</option>
             {categories.map((c) => (
@@ -194,7 +194,7 @@ export default function ArticleForm({ initial }: ArticleFormProps) {
         </div>
 
         <div>
-          <label className="mb-1 block text-sm font-medium text-charcoal">Cover image</label>
+          <label className="mb-1 block text-sm font-medium text-adminNavy">Cover image</label>
           <div className="flex items-center gap-2">
             {coverPreview ? (
               <img
@@ -203,14 +203,14 @@ export default function ArticleForm({ initial }: ArticleFormProps) {
                 alt=""
               />
             ) : values.coverImage ? (
-              <span className="text-xs text-muted">Cover image set</span>
+              <span className="text-xs text-gray-500">Cover image set</span>
             ) : (
-              <span className="text-xs text-muted">None</span>
+              <span className="text-xs text-gray-500">None</span>
             )}
             <button
               type="button"
               onClick={() => setPickerOpen(true)}
-              className="rounded border border-line px-3 py-1.5 text-xs font-semibold hover:bg-papyrus"
+              className="rounded border border-gray-200 px-3 py-1.5 text-xs font-semibold hover:bg-gray-50"
             >
               Choose…
             </button>
@@ -219,7 +219,7 @@ export default function ArticleForm({ initial }: ArticleFormProps) {
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-charcoal">Tags</label>
+        <label className="mb-1 block text-sm font-medium text-adminNavy">Tags</label>
         <div className="flex flex-wrap gap-2">
           {tags.map((t) => (
             <button
@@ -229,7 +229,7 @@ export default function ArticleForm({ initial }: ArticleFormProps) {
               className={`rounded-full border px-3 py-1 text-xs ${
                 values.tags.includes(t._id)
                   ? "border-adminOrange bg-adminOrange-soft text-adminOrange-dark"
-                  : "border-line text-muted"
+                  : "border-gray-200 text-gray-500"
               }`}
             >
               {t.name}
@@ -257,11 +257,11 @@ export default function ArticleForm({ initial }: ArticleFormProps) {
         </label>
       </div>
 
-      <div className="flex items-center gap-3 border-t border-line pt-5">
+      <div className="flex items-center gap-3 border-t border-gray-200 pt-5">
         <button
           type="submit"
           disabled={saving}
-          className="rounded border border-ink px-4 py-2 text-sm font-semibold disabled:opacity-50"
+          className="rounded border border-adminNavy px-4 py-2 text-sm font-semibold disabled:opacity-50"
         >
           Save draft
         </button>
@@ -278,7 +278,7 @@ export default function ArticleForm({ initial }: ArticleFormProps) {
         )}
 
         {!isStaff && (
-          <span className="text-xs text-muted">
+          <span className="text-xs text-gray-500">
             Authors submit as drafts — an Editor or Admin publishes.
           </span>
         )}

@@ -62,7 +62,7 @@ export default function ModerationQueue() {
             key={t}
             onClick={() => setTab(t)}
             className={`px-3 py-2 text-sm font-medium capitalize ${
-              tab === t ? "border-b-2 border-slate-900 text-slate-900" : "text-slate-500 hover:text-slate-700"
+              tab === t ? "border-b-2 border-adminOrange text-adminNavy" : "text-slate-500 hover:text-slate-700"
             }`}
           >
             {t}

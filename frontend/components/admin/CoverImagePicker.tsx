@@ -36,8 +36,8 @@ export default function CoverImagePicker({ open, onClose, onSelect }: CoverImage
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
       <div className="max-h-[80vh] w-full max-w-3xl overflow-y-auto rounded bg-white p-6">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="font-display text-lg font-semibold text-ink">Choose a cover image</h2>
-          <button onClick={onClose} className="text-sm text-muted hover:text-charcoal">
+          <h2 className="font-display text-lg font-semibold text-adminNavy">Choose a cover image</h2>
+          <button onClick={onClose} className="text-sm text-gray-500 hover:text-adminNavy">
             Close
           </button>
         </div>
@@ -47,7 +47,7 @@ export default function CoverImagePicker({ open, onClose, onSelect }: CoverImage
         </div>
 
         {loading ? (
-          <p className="text-sm text-muted">Loading…</p>
+          <p className="text-sm text-gray-500">Loading…</p>
         ) : (
           <MediaLibraryGrid
             items={items}

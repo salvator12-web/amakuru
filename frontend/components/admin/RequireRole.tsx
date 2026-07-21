@@ -24,15 +24,15 @@ export default function RequireRole({
   const { profile, loading } = useAuthUser();
 
   if (loading) {
-    return <p className="p-5 text-sm text-muted">Loading…</p>;
+    return <p className="p-5 text-sm text-gray-500">Loading…</p>;
   }
 
   if (!canAccess(profile?.role, roles)) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-[10px] border border-dashed border-line bg-white px-6 py-16 text-center">
-        <ShieldAlert size={28} className="mb-3 text-muted" />
-        <h2 className="text-sm font-bold text-ink">Not authorized</h2>
-        <p className="mt-1.5 max-w-sm text-sm text-muted">
+      <div className="flex flex-col items-center justify-center rounded-[10px] border border-dashed border-gray-200 bg-white px-6 py-16 text-center">
+        <ShieldAlert size={28} className="mb-3 text-gray-500" />
+        <h2 className="text-sm font-bold text-adminNavy">Not authorized</h2>
+        <p className="mt-1.5 max-w-sm text-sm text-gray-500">
           Your role (<strong>{profile?.role}</strong>) doesn&apos;t have access to this page. Ask an Admin if you
           need it.
         </p>
