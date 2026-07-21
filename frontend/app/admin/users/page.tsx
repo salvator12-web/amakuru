@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useAuthUser } from "@/lib/hooks/useAuthUser";
+import RequireRole from "@/components/admin/RequireRole";
 
 type UserRole = "Admin" | "Editor" | "Author" | "Moderator" | "Subscriber";
 type UserStatus = "active" | "invited" | "deactivated";
@@ -76,16 +77,8 @@ export default function UsersPage() {
     }
   }
 
-  if (!isAdmin) {
-    return (
-      <div>
-        <h1 className="font-display text-2xl font-semibold text-ink">Users &amp; Roles</h1>
-        <p className="mt-2 text-sm text-muted">Only Admins can manage user roles.</p>
-      </div>
-    );
-  }
-
   return (
+    <RequireRole roles={[]}>
     <div>
       <h1 className="font-display text-2xl font-semibold text-ink">Users &amp; Roles</h1>
       <p className="mt-1 text-sm text-muted">
@@ -149,5 +142,6 @@ export default function UsersPage() {
         </table>
       )}
     </div>
+    </RequireRole>
   );
 }
