@@ -48,44 +48,44 @@ export default function SettingsPage() {
     setSaving(false);
   }
 
-  if (loading) return <p className="text-sm text-muted">Loading…</p>;
+  if (loading) return <p className="text-sm text-gray-500">Loading…</p>;
 
   return (
     <RequireRole roles={[]}>
     <div className="max-w-2xl">
       <div className="mb-6">
-        <h1 className="font-display text-2xl font-semibold text-ink">Settings</h1>
-        <p className="mt-1 text-sm text-muted">Site-wide configuration. Admin only.</p>
+        <h1 className="font-display text-2xl font-semibold text-adminNavy">Settings</h1>
+        <p className="mt-1 text-sm text-gray-500">Site-wide configuration. Admin only.</p>
       </div>
 
-      <form onSubmit={save} className="space-y-5 rounded-[10px] border border-line bg-white p-5">
+      <form onSubmit={save} className="space-y-5 rounded-[10px] border border-gray-200 bg-white p-5">
         <div>
-          <label className="mb-1.5 block text-xs font-bold text-ink">Site name</label>
+          <label className="mb-1.5 block text-xs font-bold text-adminNavy">Site name</label>
           <input
             value={settings.siteName ?? ""}
             onChange={(e) => setSettings({ ...settings, siteName: e.target.value })}
-            className="w-full rounded border border-line bg-papyrus/20 px-3 py-2.5 text-[13.5px] text-ink outline-none focus:border-adminOrange"
+            className="w-full rounded border border-gray-200 bg-gray-50 px-3 py-2.5 text-[13.5px] text-adminNavy outline-none focus:border-adminOrange"
           />
         </div>
         <div>
-          <label className="mb-1.5 block text-xs font-bold text-ink">Tagline</label>
+          <label className="mb-1.5 block text-xs font-bold text-adminNavy">Tagline</label>
           <input
             value={settings.tagline ?? ""}
             onChange={(e) => setSettings({ ...settings, tagline: e.target.value })}
-            className="w-full rounded border border-line bg-papyrus/20 px-3 py-2.5 text-[13.5px] text-ink outline-none focus:border-adminOrange"
+            className="w-full rounded border border-gray-200 bg-gray-50 px-3 py-2.5 text-[13.5px] text-adminNavy outline-none focus:border-adminOrange"
           />
         </div>
         <div>
-          <label className="mb-1.5 block text-xs font-bold text-ink">Contact email</label>
+          <label className="mb-1.5 block text-xs font-bold text-adminNavy">Contact email</label>
           <input
             type="email"
             value={settings.contactEmail ?? ""}
             onChange={(e) => setSettings({ ...settings, contactEmail: e.target.value })}
-            className="w-full rounded border border-line bg-papyrus/20 px-3 py-2.5 text-[13.5px] text-ink outline-none focus:border-adminOrange"
+            className="w-full rounded border border-gray-200 bg-gray-50 px-3 py-2.5 text-[13.5px] text-adminNavy outline-none focus:border-adminOrange"
           />
         </div>
 
-        <div className="space-y-3 border-t border-line pt-4">
+        <div className="space-y-3 border-t border-gray-200 pt-4">
           <ToggleRow
             label="Ads enabled"
             checked={!!settings.adsEnabled}
@@ -103,7 +103,7 @@ export default function SettingsPage() {
           />
         </div>
 
-        <div className="flex items-center gap-3 border-t border-line pt-4">
+        <div className="flex items-center gap-3 border-t border-gray-200 pt-4">
           <button
             type="submit"
             disabled={saving}
@@ -130,7 +130,7 @@ function ToggleRow({
 }) {
   return (
     <label className="flex cursor-pointer items-center justify-between">
-      <span className="text-sm font-medium text-ink">{label}</span>
+      <span className="text-sm font-medium text-adminNavy">{label}</span>
       <input
         type="checkbox"
         checked={checked}
