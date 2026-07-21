@@ -44,33 +44,33 @@ export default function NewsletterPage() {
     <RequireRole roles={["Editor"]}>
     <div>
       <div className="mb-6">
-        <h1 className="font-display text-2xl font-semibold text-ink">Newsletters</h1>
-        <p className="mt-1 text-sm text-muted">Everyone signed up through the site footer.</p>
+        <h1 className="font-display text-2xl font-semibold text-adminNavy">Newsletters</h1>
+        <p className="mt-1 text-sm text-gray-500">Everyone signed up through the site footer.</p>
       </div>
 
       <div className="mb-5 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <div className="rounded-[10px] border border-line bg-white p-4">
-          <div className="mb-2 text-[11px] font-bold uppercase tracking-wide text-muted">Active subscribers</div>
-          <div className="font-mono text-[26px] font-extrabold text-ink">{activeCount.toLocaleString()}</div>
+        <div className="rounded-[10px] border border-gray-200 bg-white p-4">
+          <div className="mb-2 text-[11px] font-bold uppercase tracking-wide text-gray-500">Active subscribers</div>
+          <div className="font-mono text-[26px] font-extrabold text-adminNavy">{activeCount.toLocaleString()}</div>
         </div>
-        <div className="rounded-[10px] border border-line bg-white p-4">
-          <div className="mb-2 text-[11px] font-bold uppercase tracking-wide text-muted">Total ever signed up</div>
-          <div className="font-mono text-[26px] font-extrabold text-ink">{subscribers.length.toLocaleString()}</div>
+        <div className="rounded-[10px] border border-gray-200 bg-white p-4">
+          <div className="mb-2 text-[11px] font-bold uppercase tracking-wide text-gray-500">Total ever signed up</div>
+          <div className="font-mono text-[26px] font-extrabold text-adminNavy">{subscribers.length.toLocaleString()}</div>
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-[10px] border border-line bg-white">
-        <div className="border-b border-line px-5 py-4">
-          <h2 className="text-sm font-bold text-ink">Subscribers</h2>
+      <div className="overflow-hidden rounded-[10px] border border-gray-200 bg-white">
+        <div className="border-b border-gray-200 px-5 py-4">
+          <h2 className="text-sm font-bold text-adminNavy">Subscribers</h2>
         </div>
         {loading ? (
-          <p className="p-5 text-sm text-muted">Loading…</p>
+          <p className="p-5 text-sm text-gray-500">Loading…</p>
         ) : subscribers.length === 0 ? (
-          <p className="p-5 text-sm text-muted">No subscribers yet.</p>
+          <p className="p-5 text-sm text-gray-500">No subscribers yet.</p>
         ) : (
           <table className="w-full border-collapse text-sm">
             <thead>
-              <tr className="bg-papyrus/30 text-left text-[10.5px] font-bold uppercase tracking-wide text-muted">
+              <tr className="bg-gray-50 text-left text-[10.5px] font-bold uppercase tracking-wide text-gray-500">
                 <th className="px-5 py-2.5">Email</th>
                 <th className="px-5 py-2.5">Name</th>
                 <th className="px-5 py-2.5">Status</th>
@@ -80,9 +80,9 @@ export default function NewsletterPage() {
             </thead>
             <tbody>
               {subscribers.map((s) => (
-                <tr key={s._id} className="border-t border-line">
-                  <td className="px-5 py-3 font-mono text-xs text-ink">{s.email}</td>
-                  <td className="px-5 py-3 text-muted">{s.name ?? "—"}</td>
+                <tr key={s._id} className="border-t border-gray-200">
+                  <td className="px-5 py-3 font-mono text-xs text-adminNavy">{s.email}</td>
+                  <td className="px-5 py-3 text-gray-500">{s.name ?? "—"}</td>
                   <td className="px-5 py-3">
                     <span
                       className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${
@@ -92,10 +92,10 @@ export default function NewsletterPage() {
                       {s.active ? "Active" : "Unsubscribed"}
                     </span>
                   </td>
-                  <td className="px-5 py-3 text-xs text-muted">{new Date(s.subscribedAt).toLocaleDateString()}</td>
+                  <td className="px-5 py-3 text-xs text-gray-500">{new Date(s.subscribedAt).toLocaleDateString()}</td>
                   <td className="px-5 py-3 text-right">
                     {s.active && (
-                      <button onClick={() => unsubscribe(s.email)} className="text-muted hover:text-red-600" title="Unsubscribe">
+                      <button onClick={() => unsubscribe(s.email)} className="text-gray-500 hover:text-red-600" title="Unsubscribe">
                         <Trash2 size={14} />
                       </button>
                     )}
