@@ -18,7 +18,7 @@ interface NotificationRow {
 const STATUS_STYLES: Record<string, string> = {
   draft: "bg-gray-100 text-gray-700",
   scheduled: "bg-amber/20 text-amber-deep",
-  sent: "bg-brand-soft text-teal",
+  sent: "bg-adminOrange-soft text-adminOrange-dark",
 };
 
 export default function NotificationsPage() {
@@ -85,7 +85,7 @@ export default function NotificationsPage() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Breaking: election commission announcement"
-              className="w-full rounded border border-line bg-papyrus/20 px-3 py-2.5 text-[13.5px] text-ink outline-none focus:border-teal"
+              className="w-full rounded border border-line bg-papyrus/20 px-3 py-2.5 text-[13.5px] text-ink outline-none focus:border-adminOrange"
             />
           </div>
           <div>
@@ -93,7 +93,7 @@ export default function NotificationsPage() {
             <select
               value={audience}
               onChange={(e) => setAudience(e.target.value as typeof audience)}
-              className="w-full rounded border border-line bg-papyrus/20 px-3 py-2.5 text-[13.5px] text-ink outline-none focus:border-teal"
+              className="w-full rounded border border-line bg-papyrus/20 px-3 py-2.5 text-[13.5px] text-ink outline-none focus:border-adminOrange"
             >
               <option value="all">All users</option>
               <option value="category-subscribers">Category subscribers</option>
@@ -103,7 +103,7 @@ export default function NotificationsPage() {
           <button
             type="submit"
             disabled={sending}
-            className="h-fit rounded bg-teal px-4 py-2.5 text-sm font-bold text-white hover:bg-brand-dark disabled:opacity-60"
+            className="h-fit rounded bg-adminOrange px-4 py-2.5 text-sm font-bold text-adminNavy hover:bg-adminOrange-dark disabled:opacity-60"
           >
             {sending ? "Saving…" : "Save & send"}
           </button>
@@ -114,7 +114,7 @@ export default function NotificationsPage() {
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Short summary shown in the push notification"
               rows={2}
-              className="w-full resize-y rounded border border-line bg-papyrus/20 px-3 py-2.5 text-[13.5px] text-ink outline-none focus:border-teal"
+              className="w-full resize-y rounded border border-line bg-papyrus/20 px-3 py-2.5 text-[13.5px] text-ink outline-none focus:border-adminOrange"
             />
           </div>
           {error && <p className="text-xs text-red-600 md:col-span-3">{error}</p>}
