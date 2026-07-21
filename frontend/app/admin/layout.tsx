@@ -7,15 +7,7 @@ import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase/client";
 import { useAuthUser } from "@/lib/hooks/useAuthUser";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
-import type { LangKey } from "@/lib/i18n/translations";
-
-const STAFF_ROLES = ["Admin", "Editor", "Author"];
-
-const NAV_ITEMS: { href: string; key: LangKey }[] = [
-  { href: "/admin/articles", key: "adminArticles" },
-  { href: "/admin/media", key: "adminMedia" },
-  { href: "/admin/moderation", key: "adminModeration" },
-];
+import { STAFF_ROLES, getVisibleNavItems } from "@/lib/permissions";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { profile, loading, firebaseUser } = useAuthUser();
@@ -61,7 +53,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="text-xs text-muted">{t("adminDashboard")}</div>
         </div>
         <nav className="flex flex-col gap-1">
-          {NAV_ITEMS.map((item) => {
+          {/* Admin sees every item here automatically (getVisibleNavItems
+              grants Admin all access); other roles only see the pages
+              their role is permitted to use, per lib/permissions.ts. */}
+          {getVisibleNavItems(profile.role).map((item) => {
             const active = pathname?.startsWith(item.href);
             return (
               <Link
@@ -75,18 +70,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </Link>
             );
           })}
-          {profile.role === "Admin" && (
-            <Link
-              href="/admin/users"
-              className={`rounded px-3 py-2 text-sm font-medium ${
-                pathname?.startsWith("/admin/users")
-                  ? "bg-brand-soft text-teal"
-                  : "text-charcoal hover:bg-papyrus"
-              }`}
-            >
-              {t("adminUsersRoles")}
-            </Link>
-          )}
         </nav>
         <div className="mt-8 border-t border-line px-2 pt-4 text-xs text-muted">
           {t("adminSignedInAs")}
