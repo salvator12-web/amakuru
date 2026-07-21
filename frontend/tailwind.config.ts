@@ -20,6 +20,12 @@ const config: Config = {
         brand: "#1F7A6C",
         "brand-dark": "#175f54",
         "brand-soft": "#E4F1EE",
+        // Gigo Business Company brand palette — used for the /admin dashboard only
+        adminNavy: "#0D1B2A",
+        adminNavyLight: "#162333",
+        adminOrange: "#F5A623",
+        "adminOrange-dark": "#D9900F",
+        "adminOrange-soft": "#FFF3E0",
       },
       fontFamily: {
         display: ["Fraunces", "serif"],
