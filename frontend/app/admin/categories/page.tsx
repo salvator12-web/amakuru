@@ -118,11 +118,11 @@ export default function CategoriesPage() {
               value={newCategoryName}
               onChange={(e) => setNewCategoryName(e.target.value)}
               placeholder="e.g. Politics"
-              className="flex-1 rounded border border-line bg-papyrus/20 px-3 py-2 text-sm text-ink outline-none focus:border-teal"
+              className="flex-1 rounded border border-line bg-papyrus/20 px-3 py-2 text-sm text-ink outline-none focus:border-adminOrange"
             />
             <button
               type="submit"
-              className="inline-flex items-center gap-1.5 rounded bg-teal px-3 py-2 text-sm font-bold text-white hover:bg-brand-dark"
+              className="inline-flex items-center gap-1.5 rounded bg-adminOrange px-3 py-2 text-sm font-bold text-adminNavy hover:bg-adminOrange-dark"
             >
               <Plus size={14} /> Add
             </button>
@@ -158,11 +158,11 @@ export default function CategoriesPage() {
               value={newTagName}
               onChange={(e) => setNewTagName(e.target.value)}
               placeholder="e.g. elections-2026"
-              className="flex-1 rounded border border-line bg-papyrus/20 px-3 py-2 text-sm text-ink outline-none focus:border-teal"
+              className="flex-1 rounded border border-line bg-papyrus/20 px-3 py-2 text-sm text-ink outline-none focus:border-adminOrange"
             />
             <button
               type="submit"
-              className="inline-flex items-center gap-1.5 rounded bg-teal px-3 py-2 text-sm font-bold text-white hover:bg-brand-dark"
+              className="inline-flex items-center gap-1.5 rounded bg-adminOrange px-3 py-2 text-sm font-bold text-adminNavy hover:bg-adminOrange-dark"
             >
               <Plus size={14} /> Add
             </button>
