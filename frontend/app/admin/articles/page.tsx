@@ -54,8 +54,8 @@ export default function AdminArticlesPage() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="font-display text-2xl font-semibold text-ink">Articles</h1>
-          <p className="text-sm text-muted">Drafts, scheduled, and published content.</p>
+          <h1 className="font-display text-2xl font-semibold text-adminNavy">Articles</h1>
+          <p className="text-sm text-gray-500">Drafts, scheduled, and published content.</p>
         </div>
         <Link
           href="/admin/articles/new"
@@ -71,7 +71,7 @@ export default function AdminArticlesPage() {
             key={s || "all"}
             onClick={() => setStatusFilter(s)}
             className={`rounded-full border px-3 py-1 text-xs capitalize ${
-              statusFilter === s ? "border-adminOrange bg-adminOrange-soft text-adminOrange-dark" : "border-line text-muted"
+              statusFilter === s ? "border-adminOrange bg-adminOrange-soft text-adminOrange-dark" : "border-gray-200 text-gray-500"
             }`}
           >
             {s || "All"}
@@ -80,12 +80,12 @@ export default function AdminArticlesPage() {
       </div>
 
       {loading ? (
-        <p className="text-sm text-muted">Loading…</p>
+        <p className="text-sm text-gray-500">Loading…</p>
       ) : articles.length === 0 ? (
-        <p className="text-sm text-muted">No articles yet.</p>
+        <p className="text-sm text-gray-500">No articles yet.</p>
       ) : (
         <table className="w-full text-left text-sm">
-          <thead className="border-b border-line text-xs uppercase text-muted">
+          <thead className="border-b border-gray-200 text-xs uppercase text-gray-500">
             <tr>
               <th className="py-2">Title</th>
               <th>Category</th>
@@ -96,10 +96,10 @@ export default function AdminArticlesPage() {
           </thead>
           <tbody>
             {articles.map((a) => (
-              <tr key={a._id} className="border-b border-line">
-                <td className="py-2 font-medium text-charcoal">{a.title}</td>
-                <td className="text-muted">{a.category?.name || "—"}</td>
-                <td className="text-muted">{a.author?.name || "—"}</td>
+              <tr key={a._id} className="border-b border-gray-200">
+                <td className="py-2 font-medium text-adminNavy">{a.title}</td>
+                <td className="text-gray-500">{a.category?.name || "—"}</td>
+                <td className="text-gray-500">{a.author?.name || "—"}</td>
                 <td>
                   <span className={`rounded px-2 py-0.5 text-xs ${STATUS_STYLES[a.status]}`}>
                     {a.status}
