@@ -1,225 +1,275 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { apiUrl } from "@/lib/api";
-import type { ArticleSummary, CategorySummary } from "@/lib/types";
-import SiteChrome from "@/components/site/SiteChrome";
-import BreakingTicker from "@/components/site/BreakingTicker";
-import ArticleCard from "@/components/site/ArticleCard";
-import SectionHead from "@/components/site/SectionHead";
-import NewsletterBox from "@/components/site/NewsletterBox";
+import { useAuthUser } from "@/lib/hooks/useAuthUser";
+import { Download, Plus, MessagesSquare } from "lucide-react";
 
-const SECTION_DOTS: Record<string, string> = {
-  politics: "#C4632B", // amber-deep
-  business: "#2F6F5E", // teal
-  culture: "#8B5FBF",
-  sport: "#C9302C",
-};
-
-function timeAgo(dateStr?: string) {
-  if (!dateStr) return "";
-  const hrs = Math.floor((Date.now() - new Date(dateStr).getTime()) / 3_600_000);
-  if (hrs < 1) return "Just now";
-  if (hrs < 24) return `${hrs}h ago`;
-  const days = Math.floor(hrs / 24);
-  return days === 1 ? "Yesterday" : `${days}d ago`;
+interface ArticleRow {
+  _id: string;
+  title: string;
+  slug: string;
+  status: "draft" | "scheduled" | "published";
+  category?: { name: string };
+  author?: { name: string };
+  createdAt: string;
 }
 
-export default function HomePage() {
+const STATUS_STYLES: Record<string, string> = {
+  draft: "bg-gray-100 text-gray-700",
+  scheduled: "bg-amber/20 text-amber-deep",
+  published: "bg-adminOrange-soft text-adminOrange-dark",
+};
+
+export default function AdminDashboardPage() {
+  const { profile, authedFetch } = useAuthUser();
+
+  const [published, setPublished] = useState<number | null>(null);
+  const [drafts, setDrafts] = useState<number | null>(null);
+  const [scheduled, setScheduled] = useState<number | null>(null);
+  const [pendingComments, setPendingComments] = useState<number | null>(null);
+  const [recent, setRecent] = useState<ArticleRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [categories, setCategories] = useState<CategorySummary[]>([]);
-  const [breaking, setBreaking] = useState<ArticleSummary[]>([]);
-  const [featured, setFeatured] = useState<ArticleSummary | null>(null);
-  const [sidePicks, setSidePicks] = useState<ArticleSummary[]>([]);
-  const [sectionArticles, setSectionArticles] = useState<Record<string, ArticleSummary[]>>({});
+
+  const [title, setTitle] = useState("");
+  const [message, setMessage] = useState("");
+  const [audience, setAudience] = useState<"all" | "category-subscribers" | "breaking-news-only">("all");
+  const [sending, setSending] = useState(false);
+  const [sendResult, setSendResult] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    const [publishedRes, draftRes, scheduledRes, commentsRes] = await Promise.all([
+      authedFetch("/api/articles?status=published&limit=8"),
+      authedFetch("/api/articles?status=draft&limit=1"),
+      authedFetch("/api/articles?status=scheduled&limit=1"),
+      authedFetch("/api/comments?status=pending&limit=1"),
+    ]);
+
+    if (publishedRes.ok) {
+      const data = await publishedRes.json();
+      setPublished(data.pagination?.total ?? 0);
+      setRecent(data.articles ?? []);
+    }
+    if (draftRes.ok) {
+      const data = await draftRes.json();
+      setDrafts(data.pagination?.total ?? 0);
+    }
+    if (scheduledRes.ok) {
+      const data = await scheduledRes.json();
+      setScheduled(data.pagination?.total ?? 0);
+    }
+    if (commentsRes.ok) {
+      const data = await commentsRes.json();
+      setPendingComments(data.total ?? 0);
+    }
+    setLoading(false);
+  }, [authedFetch]);
 
   useEffect(() => {
-    let cancelled = false;
-
-    async function load() {
-      try {
-        const [catsRes, latestRes, breakingRes] = await Promise.all([
-          fetch(apiUrl("/api/categories")),
-          fetch(apiUrl("/api/articles?limit=9")),
-          fetch(apiUrl("/api/articles?limit=6")), // filtered client-side for isBreaking below
-        ]);
-
-        if (!catsRes.ok || !latestRes.ok) throw new Error("Failed to load homepage data");
-
-        const catsData = await catsRes.json();
-        const latestData = await latestRes.json();
-        const breakingData = breakingRes.ok ? await breakingRes.json() : { articles: [] };
-
-        if (cancelled) return;
-
-        const cats: CategorySummary[] = catsData.categories || [];
-        const latest: ArticleSummary[] = latestData.articles || [];
-
-        setCategories(cats);
-        setBreaking((breakingData.articles || []).filter((a: ArticleSummary) => a.isBreaking));
-
-        const featuredArticle = latest.find((a) => a.isFeatured) || latest[0] || null;
-        setFeatured(featuredArticle);
-        setSidePicks(latest.filter((a) => a._id !== featuredArticle?._id).slice(0, 2));
-
-        // Pull one section's worth of articles per category (first 3 categories).
-        const sectionsToShow = cats.slice(0, 3);
-        const results = await Promise.all(
-          sectionsToShow.map((c) =>
-            fetch(apiUrl(`/api/articles?category=${c._id}&limit=4`)).then((r) => (r.ok ? r.json() : { articles: [] }))
-          )
-        );
-        if (cancelled) return;
-        const map: Record<string, ArticleSummary[]> = {};
-        sectionsToShow.forEach((c, i) => {
-          map[c._id] = results[i].articles || [];
-        });
-        setSectionArticles(map);
-      } catch (err) {
-        if (!cancelled) setError(err instanceof Error ? err.message : "Something went wrong");
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    }
-
     load();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  }, [load]);
 
-  if (loading) {
-    return (
-      <SiteChrome>
-        <div className="flex min-h-[50vh] items-center justify-center font-mono text-sm text-muted">
-          Loading the front page…
-        </div>
-      </SiteChrome>
-    );
+  async function handleSend(e: React.FormEvent) {
+    e.preventDefault();
+    if (!title.trim() || !message.trim()) return;
+    setSending(true);
+    setSendResult(null);
+    const res = await authedFetch("/api/notifications", {
+      method: "POST",
+      body: JSON.stringify({ title, message, audience }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      const reach = data.notification?.deliveryStats?.estimatedReach ?? 0;
+      setSendResult(`Saved — estimated reach ${reach.toLocaleString()} devices.`);
+      setTitle("");
+      setMessage("");
+    } else {
+      setSendResult("Couldn't save the notification. Check the fields and try again.");
+    }
+    setSending(false);
   }
 
-  if (error) {
-    return (
-      <SiteChrome>
-        <div className="mx-auto max-w-lg px-6 py-20 text-center">
-          <p className="font-mono text-sm text-muted">
-            Couldn't reach the backend. Is it running?
-          </p>
-          <p className="mt-2 font-mono text-xs text-muted">{error}</p>
-        </div>
-      </SiteChrome>
-    );
-  }
+  const now = new Date();
 
   return (
-    <SiteChrome>
-      <BreakingTicker articles={breaking} />
-
-      {/* Hero */}
-      {featured && (
-        <section className="border-b border-line px-4 py-8 sm:px-6 lg:py-12">
-          <div className="mx-auto grid max-w-6xl grid-cols-1 gap-8 lg:grid-cols-[1.6fr_1fr]">
-            <Link href={`/articles/${featured.slug}`} className="group block">
-              <div className="mb-4 aspect-[16/10] w-full overflow-hidden rounded-sm bg-papyrus">
-                {featured.coverImage?.secureUrl && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={featured.coverImage.secureUrl}
-                    alt={featured.coverImage.altText || featured.title}
-                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
-                  />
-                )}
-              </div>
-              <span className="mb-2 block font-mono text-[11px] uppercase tracking-wide text-amber-deep">
-                {featured.category?.name || "Amakuru"}
-              </span>
-              <h1 className="mb-3 font-display text-[30px] font-semibold leading-tight text-ink group-hover:text-amber-deep sm:text-[38px]">
-                {featured.title}
-              </h1>
-              <p className="max-w-[60ch] text-[15px] leading-relaxed text-charcoal">{featured.dek}</p>
-              <span className="mt-3 block font-mono text-xs text-muted">
-                {timeAgo(featured.publishedAt || featured.createdAt)} · {featured.readTimeMinutes} min read
-              </span>
-            </Link>
-
-            <div className="flex flex-col gap-5 border-t border-line pt-5 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0">
-              <h2 className="font-mono text-[11px] uppercase tracking-wide text-muted">Also today</h2>
-              {sidePicks.map((a) => (
-                <Link
-                  key={a._id}
-                  href={`/articles/${a.slug}`}
-                  className="group flex gap-3 border-b border-line pb-4 last:border-0 sm:gap-4"
-                >
-                  <div className="hidden h-20 w-28 shrink-0 overflow-hidden rounded-sm bg-papyrus sm:block">
-                    {a.coverImage?.secureUrl && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={a.coverImage.secureUrl}
-                        alt={a.coverImage.altText || a.title}
-                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
-                      />
-                    )}
-                  </div>
-                  <div className="min-w-0">
-                    <span className="mb-1 block font-mono text-[10px] uppercase tracking-wide text-teal">
-                      {a.category?.name || "Amakuru"}
-                    </span>
-                    <h3 className="text-[15px] font-semibold leading-snug text-ink group-hover:text-amber-deep">
-                      {a.title}
-                    </h3>
-                    <p className="mt-1 hidden text-[13px] leading-snug text-charcoal sm:line-clamp-2 sm:block">
-                      {a.dek}
-                    </p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Category sections */}
-      {categories.slice(0, 3).map((cat) => {
-        const articles = sectionArticles[cat._id] || [];
-        if (articles.length === 0) return null;
-        return (
-          <section key={cat._id} className="px-4 py-9 sm:px-6">
-            <div className="mx-auto max-w-6xl">
-              <SectionHead
-                label={cat.name}
-                dotColor={SECTION_DOTS[cat.slug] || cat.colorDot || "#2F6F5E"}
-                seeAllHref={`/category/${cat.slug}`}
-              />
-              <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-                {articles.map((a) => (
-                  <ArticleCard key={a._id} article={a} />
-                ))}
-              </div>
-            </div>
-          </section>
-        );
-      })}
-
-      {/* Newsletter */}
-      <section className="grid grid-cols-1 border-t border-line lg:grid-cols-2">
-        <NewsletterBox />
-        <div className="flex flex-col justify-center bg-papyrus px-6 py-9 sm:px-8">
-          <h2 className="mb-2.5 font-display text-2xl font-semibold text-ink">Explore every section</h2>
-          <div className="flex flex-wrap gap-2">
-            {categories.map((c) => (
-              <Link
-                key={c._id}
-                href={`/category/${c.slug}`}
-                className="rounded-full border border-ink px-4 py-1.5 text-[13px] font-semibold text-ink hover:bg-ink hover:text-white"
-              >
-                {c.name}
-              </Link>
-            ))}
-          </div>
+    <div>
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="font-display text-2xl font-semibold text-ink">
+            Good {now.getHours() < 12 ? "morning" : now.getHours() < 18 ? "afternoon" : "evening"}
+            {profile?.name ? `, ${profile.name.split(" ")[0]}` : ""}
+          </h1>
+          <p className="mt-1 text-sm text-muted">
+            Here&apos;s how Amakuru is performing —{" "}
+            {now.toLocaleDateString("en-US", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
+          </p>
         </div>
-      </section>
-    </SiteChrome>
+        <div className="flex gap-2">
+          <Link
+            href="/admin/articles"
+            className="inline-flex items-center gap-2 rounded border border-line bg-white px-3.5 py-2 text-sm font-semibold text-ink hover:border-adminOrange hover:text-adminOrange-dark"
+          >
+            <Download size={14} /> View all articles
+          </Link>
+          <Link
+            href="/admin/articles/new"
+            className="inline-flex items-center gap-2 rounded bg-adminOrange px-3.5 py-2 text-sm font-semibold text-adminNavy hover:bg-adminOrange-dark"
+          >
+            <Plus size={14} /> New article
+          </Link>
+        </div>
+      </div>
+
+      {/* KPI cards */}
+      <div className="mb-5 grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <KpiCard label="Published articles" value={published} dotColor="bg-adminOrange" />
+        <KpiCard label="Drafts" value={drafts} dotColor="bg-amber" />
+        <KpiCard label="Scheduled" value={scheduled} dotColor="bg-[#175CD3]" />
+        <KpiCard
+          label="Pending comments"
+          value={pendingComments}
+          dotColor="bg-[#B42318]"
+          href="/admin/moderation"
+        />
+      </div>
+
+      {/* Recent articles */}
+      <div className="mb-5 overflow-hidden rounded-[10px] border border-line bg-white">
+        <div className="flex items-center justify-between border-b border-line px-5 py-4">
+          <div>
+            <h2 className="text-sm font-bold text-ink">Recent articles</h2>
+            <div className="text-xs text-muted">Latest published across all categories</div>
+          </div>
+          <Link href="/admin/articles" className="text-xs font-semibold text-adminOrange-dark hover:underline">
+            View all
+          </Link>
+        </div>
+        {loading ? (
+          <p className="p-5 text-sm text-muted">Loading…</p>
+        ) : recent.length === 0 ? (
+          <p className="p-5 text-sm text-muted">No published articles yet.</p>
+        ) : (
+          <table className="w-full border-collapse text-sm">
+            <thead>
+              <tr className="bg-papyrus/30 text-left text-[10.5px] font-bold uppercase tracking-wide text-muted">
+                <th className="px-5 py-2.5">Article</th>
+                <th className="px-5 py-2.5">Category</th>
+                <th className="px-5 py-2.5">Status</th>
+                <th className="px-5 py-2.5" />
+              </tr>
+            </thead>
+            <tbody>
+              {recent.map((a) => (
+                <tr key={a._id} className="border-t border-line hover:bg-papyrus/10">
+                  <td className="px-5 py-3">
+                    <div className="font-semibold text-ink">{a.title}</div>
+                    <div className="text-xs text-muted">
+                      {a.author?.name ?? "Unknown"} · {new Date(a.createdAt).toLocaleDateString()}
+                    </div>
+                  </td>
+                  <td className="px-5 py-3 text-muted">{a.category?.name ?? "—"}</td>
+                  <td className="px-5 py-3">
+                    <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${STATUS_STYLES[a.status]}`}>
+                      {a.status}
+                    </span>
+                  </td>
+                  <td className="px-5 py-3 text-right">
+                    <Link href={`/admin/articles/${a._id}`} className="text-xs font-semibold text-adminOrange-dark hover:underline">
+                      Edit
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      {/* Notification composer */}
+      <div className="overflow-hidden rounded-[10px] border border-line bg-white">
+        <div className="border-b border-line px-5 py-4">
+          <h2 className="text-sm font-bold text-ink">Send notification</h2>
+          <div className="text-xs text-muted">Push to subscribed devices, in the languages readers chose</div>
+        </div>
+        <form onSubmit={handleSend} className="grid gap-4 p-5 md:grid-cols-2">
+          <div className="space-y-4">
+            <div>
+              <label className="mb-1.5 block text-xs font-bold text-ink">Title</label>
+              <input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="e.g. Breaking: election commission announcement"
+                className="w-full rounded border border-line bg-papyrus/20 px-3 py-2.5 text-[13.5px] text-ink outline-none focus:border-adminOrange"
+              />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-bold text-ink">Message</label>
+              <textarea
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                placeholder="Short summary shown in the push notification"
+                rows={3}
+                className="w-full resize-y rounded border border-line bg-papyrus/20 px-3 py-2.5 text-[13.5px] text-ink outline-none focus:border-adminOrange"
+              />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-bold text-ink">Audience</label>
+              <select
+                value={audience}
+                onChange={(e) => setAudience(e.target.value as typeof audience)}
+                className="w-full rounded border border-line bg-papyrus/20 px-3 py-2.5 text-[13.5px] text-ink outline-none focus:border-adminOrange"
+              >
+                <option value="all">All users</option>
+                <option value="category-subscribers">Category subscribers</option>
+                <option value="breaking-news-only">Breaking news only</option>
+              </select>
+            </div>
+            <button
+              type="submit"
+              disabled={sending}
+              className="inline-flex items-center gap-2 rounded bg-adminOrange px-4 py-2.5 text-sm font-bold text-adminNavy hover:bg-adminOrange-dark disabled:opacity-60"
+            >
+              {sending ? "Sending…" : "Send notification"}
+            </button>
+            {sendResult && <p className="text-xs text-muted">{sendResult}</p>}
+          </div>
+          <div className="rounded-lg border border-dashed border-line bg-papyrus/20 p-4">
+            <div className="mb-1 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-muted">
+              <MessagesSquare size={13} /> Delivery preview
+            </div>
+            <div className="text-sm font-bold text-ink">Amakuru</div>
+            <p className="mt-1 text-[13px] text-muted">
+              {message.trim() ? message : "Short summary shown in the push notification…"}
+            </p>
+            <div className="mt-3 font-mono text-[11px] text-muted">now · amakuru.rw</div>
+          </div>
+        </form>
+      </div>
+    </div>
   );
+}
+
+function KpiCard({
+  label,
+  value,
+  dotColor,
+  href,
+}: {
+  label: string;
+  value: number | null;
+  dotColor: string;
+  href?: string;
+}) {
+  const content = (
+    <div className="rounded-[10px] border border-line bg-white p-4">
+      <div className="mb-2.5 flex items-center justify-between">
+        <span className="text-[11px] font-bold uppercase tracking-wide text-muted">{label}</span>
+        <span className={`h-2 w-2 rounded-full ${dotColor}`} />
+      </div>
+      <div className="font-mono text-[26px] font-extrabold text-ink">{value === null ? "—" : value.toLocaleString()}</div>
+    </div>
+  );
+  return href ? <Link href={href}>{content}</Link> : content;
 }
