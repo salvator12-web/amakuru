@@ -30,14 +30,14 @@ export default function MediaLibraryPage() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="font-display text-2xl font-semibold text-ink">Media Library</h1>
-          <p className="text-sm text-muted">Images and video used across articles.</p>
+          <h1 className="font-display text-2xl font-semibold text-adminNavy">Media Library</h1>
+          <p className="text-sm text-gray-500">Images and video used across articles.</p>
         </div>
         <MediaUploader onUploaded={refetch} />
       </div>
 
       {loading ? (
-        <p className="text-sm text-muted">Loading…</p>
+        <p className="text-sm text-gray-500">Loading…</p>
       ) : (
         <MediaLibraryGrid items={items} onChanged={refetch} mode="manage" />
       )}
