@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useAuthUser } from "@/lib/hooks/useAuthUser";
+import RequireRole from "@/components/admin/RequireRole";
 
 interface NotificationRow {
   _id: string;
@@ -66,6 +67,7 @@ export default function NotificationsPage() {
   }
 
   return (
+    <RequireRole roles={["Editor"]}>
     <div>
       <div className="mb-6">
         <h1 className="font-display text-2xl font-semibold text-ink">Notifications</h1>
@@ -162,5 +164,6 @@ export default function NotificationsPage() {
         )}
       </div>
     </div>
+    </RequireRole>
   );
 }
