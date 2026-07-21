@@ -27,7 +27,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <div className="mx-auto max-w-md p-8 text-center">
         <h1 className="font-display text-2xl font-semibold text-ink">{t("adminSignInRequiredTitle")}</h1>
         <p className="mt-2 text-sm text-muted">{t("adminSignInRequiredBody")}</p>
-        <Link href="/" className="mt-4 inline-block rounded bg-teal px-4 py-2 text-sm font-semibold text-white">
+        <Link href="/" className="mt-4 inline-block rounded bg-adminOrange px-4 py-2 text-sm font-semibold text-adminNavy">
           {t("adminGoToHomepage")}
         </Link>
       </div>
@@ -46,11 +46,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="flex min-h-screen bg-papyrus/40">
-      <aside className="w-56 shrink-0 border-r border-line bg-white p-4">
+    <div className="flex min-h-screen bg-gray-50">
+      <aside className="w-56 shrink-0 bg-adminNavy p-4">
         <div className="mb-6 px-2">
-          <div className="font-display text-lg font-semibold text-ink">Amakuru</div>
-          <div className="text-xs text-muted">{t("adminDashboard")}</div>
+          <div className="font-display text-lg font-semibold text-white">
+            Amakuru <span className="text-adminOrange">•</span>
+          </div>
+          <div className="text-xs text-white/50">{t("adminDashboard")}</div>
         </div>
         <nav className="flex flex-col gap-1">
           {/* Admin sees every item here automatically (getVisibleNavItems
@@ -62,8 +64,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <Link
                 key={item.href}
                 href={item.href}
-                className={`rounded px-3 py-2 text-sm font-medium ${
-                  active ? "bg-brand-soft text-teal" : "text-charcoal hover:bg-papyrus"
+                className={`rounded px-3 py-2 text-sm font-medium transition-colors ${
+                  active
+                    ? "bg-adminOrange text-adminNavy font-semibold"
+                    : "text-white/70 hover:bg-adminNavyLight hover:text-white"
                 }`}
               >
                 {t(item.key)}
@@ -71,13 +75,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             );
           })}
         </nav>
-        <div className="mt-8 border-t border-line px-2 pt-4 text-xs text-muted">
+        <div className="mt-8 border-t border-white/10 px-2 pt-4 text-xs text-white/50">
           {t("adminSignedInAs")}
-          <div className="mt-1 font-medium text-charcoal">{profile.name}</div>
-          <div>{profile.role}</div>
+          <div className="mt-1 font-medium text-white">{profile.name}</div>
+          <div className="text-adminOrange">{profile.role}</div>
           <button
             onClick={() => signOut(auth)}
-            className="mt-3 w-full rounded border border-ink px-3 py-1.5 text-xs font-semibold text-ink hover:bg-ink hover:text-white"
+            className="mt-3 w-full rounded border border-white/20 px-3 py-1.5 text-xs font-semibold text-white hover:bg-adminOrange hover:border-adminOrange hover:text-adminNavy"
           >
             {t("adminSignOut")}
           </button>
