@@ -1,7 +1,9 @@
 import { LineChart } from "lucide-react";
+import RequireRole from "@/components/admin/RequireRole";
 
 export default function AnalyticsPage() {
   return (
+    <RequireRole roles={[]}>
     <div>
       <div className="mb-6">
         <h1 className="font-display text-2xl font-semibold text-ink">Analytics</h1>
@@ -17,5 +19,6 @@ export default function AnalyticsPage() {
         </p>
       </div>
     </div>
+    </RequireRole>
   );
 }
