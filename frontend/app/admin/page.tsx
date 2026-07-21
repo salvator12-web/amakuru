@@ -18,7 +18,7 @@ interface ArticleRow {
 const STATUS_STYLES: Record<string, string> = {
   draft: "bg-gray-100 text-gray-700",
   scheduled: "bg-amber/20 text-amber-deep",
-  published: "bg-brand-soft text-teal",
+  published: "bg-adminOrange-soft text-adminOrange-dark",
 };
 
 export default function AdminDashboardPage() {
@@ -97,11 +97,11 @@ export default function AdminDashboardPage() {
     <div>
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-2xl font-semibold text-ink">
+          <h1 className="font-display text-2xl font-semibold text-adminNavy">
             Good {now.getHours() < 12 ? "morning" : now.getHours() < 18 ? "afternoon" : "evening"}
             {profile?.name ? `, ${profile.name.split(" ")[0]}` : ""}
           </h1>
-          <p className="mt-1 text-sm text-muted">
+          <p className="mt-1 text-sm text-gray-500">
             Here&apos;s how Amakuru is performing —{" "}
             {now.toLocaleDateString("en-US", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
           </p>
@@ -109,13 +109,13 @@ export default function AdminDashboardPage() {
         <div className="flex gap-2">
           <Link
             href="/admin/articles"
-            className="inline-flex items-center gap-2 rounded border border-line bg-white px-3.5 py-2 text-sm font-semibold text-ink hover:border-teal hover:text-teal"
+            className="inline-flex items-center gap-2 rounded border border-gray-200 bg-white px-3.5 py-2 text-sm font-semibold text-adminNavy hover:border-adminOrange hover:text-adminOrange-dark"
           >
             <Download size={14} /> View all articles
           </Link>
           <Link
             href="/admin/articles/new"
-            className="inline-flex items-center gap-2 rounded bg-teal px-3.5 py-2 text-sm font-semibold text-white hover:bg-brand-dark"
+            className="inline-flex items-center gap-2 rounded bg-adminOrange px-3.5 py-2 text-sm font-semibold text-adminNavy hover:bg-adminOrange-dark"
           >
             <Plus size={14} /> New article
           </Link>
@@ -124,7 +124,7 @@ export default function AdminDashboardPage() {
 
       {/* KPI cards */}
       <div className="mb-5 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <KpiCard label="Published articles" value={published} dotColor="bg-teal" />
+        <KpiCard label="Published articles" value={published} dotColor="bg-adminOrange" />
         <KpiCard label="Drafts" value={drafts} dotColor="bg-amber" />
         <KpiCard label="Scheduled" value={scheduled} dotColor="bg-[#175CD3]" />
         <KpiCard
@@ -136,24 +136,24 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Recent articles */}
-      <div className="mb-5 overflow-hidden rounded-[10px] border border-line bg-white">
-        <div className="flex items-center justify-between border-b border-line px-5 py-4">
+      <div className="mb-5 overflow-hidden rounded-[10px] border border-gray-200 bg-white">
+        <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
           <div>
-            <h2 className="text-sm font-bold text-ink">Recent articles</h2>
-            <div className="text-xs text-muted">Latest published across all categories</div>
+            <h2 className="text-sm font-bold text-adminNavy">Recent articles</h2>
+            <div className="text-xs text-gray-500">Latest published across all categories</div>
           </div>
-          <Link href="/admin/articles" className="text-xs font-semibold text-teal hover:underline">
+          <Link href="/admin/articles" className="text-xs font-semibold text-adminOrange-dark hover:underline">
             View all
           </Link>
         </div>
         {loading ? (
-          <p className="p-5 text-sm text-muted">Loading…</p>
+          <p className="p-5 text-sm text-gray-500">Loading…</p>
         ) : recent.length === 0 ? (
-          <p className="p-5 text-sm text-muted">No published articles yet.</p>
+          <p className="p-5 text-sm text-gray-500">No published articles yet.</p>
         ) : (
           <table className="w-full border-collapse text-sm">
             <thead>
-              <tr className="bg-papyrus/30 text-left text-[10.5px] font-bold uppercase tracking-wide text-muted">
+              <tr className="bg-gray-50 text-left text-[10.5px] font-bold uppercase tracking-wide text-gray-500">
                 <th className="px-5 py-2.5">Article</th>
                 <th className="px-5 py-2.5">Category</th>
                 <th className="px-5 py-2.5">Status</th>
@@ -162,21 +162,21 @@ export default function AdminDashboardPage() {
             </thead>
             <tbody>
               {recent.map((a) => (
-                <tr key={a._id} className="border-t border-line hover:bg-papyrus/10">
+                <tr key={a._id} className="border-t border-gray-200 hover:bg-gray-50">
                   <td className="px-5 py-3">
-                    <div className="font-semibold text-ink">{a.title}</div>
-                    <div className="text-xs text-muted">
+                    <div className="font-semibold text-adminNavy">{a.title}</div>
+                    <div className="text-xs text-gray-500">
                       {a.author?.name ?? "Unknown"} · {new Date(a.createdAt).toLocaleDateString()}
                     </div>
                   </td>
-                  <td className="px-5 py-3 text-muted">{a.category?.name ?? "—"}</td>
+                  <td className="px-5 py-3 text-gray-500">{a.category?.name ?? "—"}</td>
                   <td className="px-5 py-3">
                     <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${STATUS_STYLES[a.status]}`}>
                       {a.status}
                     </span>
                   </td>
                   <td className="px-5 py-3 text-right">
-                    <Link href={`/admin/articles/${a._id}`} className="text-xs font-semibold text-teal hover:underline">
+                    <Link href={`/admin/articles/${a._id}`} className="text-xs font-semibold text-adminOrange-dark hover:underline">
                       Edit
                     </Link>
                   </td>
@@ -188,38 +188,38 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Notification composer */}
-      <div className="overflow-hidden rounded-[10px] border border-line bg-white">
-        <div className="border-b border-line px-5 py-4">
-          <h2 className="text-sm font-bold text-ink">Send notification</h2>
-          <div className="text-xs text-muted">Push to subscribed devices, in the languages readers chose</div>
+      <div className="overflow-hidden rounded-[10px] border border-gray-200 bg-white">
+        <div className="border-b border-gray-200 px-5 py-4">
+          <h2 className="text-sm font-bold text-adminNavy">Send notification</h2>
+          <div className="text-xs text-gray-500">Push to subscribed devices, in the languages readers chose</div>
         </div>
         <form onSubmit={handleSend} className="grid gap-4 p-5 md:grid-cols-2">
           <div className="space-y-4">
             <div>
-              <label className="mb-1.5 block text-xs font-bold text-ink">Title</label>
+              <label className="mb-1.5 block text-xs font-bold text-adminNavy">Title</label>
               <input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g. Breaking: election commission announcement"
-                className="w-full rounded border border-line bg-papyrus/20 px-3 py-2.5 text-[13.5px] text-ink outline-none focus:border-teal"
+                className="w-full rounded border border-gray-200 bg-gray-50 px-3 py-2.5 text-[13.5px] text-adminNavy outline-none focus:border-adminOrange"
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-bold text-ink">Message</label>
+              <label className="mb-1.5 block text-xs font-bold text-adminNavy">Message</label>
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Short summary shown in the push notification"
                 rows={3}
-                className="w-full resize-y rounded border border-line bg-papyrus/20 px-3 py-2.5 text-[13.5px] text-ink outline-none focus:border-teal"
+                className="w-full resize-y rounded border border-gray-200 bg-gray-50 px-3 py-2.5 text-[13.5px] text-adminNavy outline-none focus:border-adminOrange"
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-bold text-ink">Audience</label>
+              <label className="mb-1.5 block text-xs font-bold text-adminNavy">Audience</label>
               <select
                 value={audience}
                 onChange={(e) => setAudience(e.target.value as typeof audience)}
-                className="w-full rounded border border-line bg-papyrus/20 px-3 py-2.5 text-[13.5px] text-ink outline-none focus:border-teal"
+                className="w-full rounded border border-gray-200 bg-gray-50 px-3 py-2.5 text-[13.5px] text-adminNavy outline-none focus:border-adminOrange"
               >
                 <option value="all">All users</option>
                 <option value="category-subscribers">Category subscribers</option>
@@ -229,21 +229,21 @@ export default function AdminDashboardPage() {
             <button
               type="submit"
               disabled={sending}
-              className="inline-flex items-center gap-2 rounded bg-teal px-4 py-2.5 text-sm font-bold text-white hover:bg-brand-dark disabled:opacity-60"
+              className="inline-flex items-center gap-2 rounded bg-adminOrange px-4 py-2.5 text-sm font-bold text-adminNavy hover:bg-adminOrange-dark disabled:opacity-60"
             >
               {sending ? "Sending…" : "Send notification"}
             </button>
-            {sendResult && <p className="text-xs text-muted">{sendResult}</p>}
+            {sendResult && <p className="text-xs text-gray-500">{sendResult}</p>}
           </div>
-          <div className="rounded-lg border border-dashed border-line bg-papyrus/20 p-4">
-            <div className="mb-1 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-muted">
+          <div className="rounded-lg border border-dashed border-gray-200 bg-gray-50 p-4">
+            <div className="mb-1 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-gray-500">
               <MessagesSquare size={13} /> Delivery preview
             </div>
-            <div className="text-sm font-bold text-ink">Amakuru</div>
-            <p className="mt-1 text-[13px] text-muted">
+            <div className="text-sm font-bold text-adminNavy">Amakuru</div>
+            <p className="mt-1 text-[13px] text-gray-500">
               {message.trim() ? message : "Short summary shown in the push notification…"}
             </p>
-            <div className="mt-3 font-mono text-[11px] text-muted">now · amakuru.rw</div>
+            <div className="mt-3 font-mono text-[11px] text-gray-500">now · amakuru.rw</div>
           </div>
         </form>
       </div>
@@ -263,12 +263,12 @@ function KpiCard({
   href?: string;
 }) {
   const content = (
-    <div className="rounded-[10px] border border-line bg-white p-4">
+    <div className="rounded-[10px] border border-gray-200 bg-white p-4">
       <div className="mb-2.5 flex items-center justify-between">
-        <span className="text-[11px] font-bold uppercase tracking-wide text-muted">{label}</span>
+        <span className="text-[11px] font-bold uppercase tracking-wide text-gray-500">{label}</span>
         <span className={`h-2 w-2 rounded-full ${dotColor}`} />
       </div>
-      <div className="font-mono text-[26px] font-extrabold text-ink">{value === null ? "—" : value.toLocaleString()}</div>
+      <div className="font-mono text-[26px] font-extrabold text-adminNavy">{value === null ? "—" : value.toLocaleString()}</div>
     </div>
   );
   return href ? <Link href={href}>{content}</Link> : content;

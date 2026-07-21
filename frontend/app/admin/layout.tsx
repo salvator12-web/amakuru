@@ -16,7 +16,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center text-sm text-muted">
+      <div className="flex min-h-screen items-center justify-center text-sm text-gray-500">
         {t("adminLoading")}
       </div>
     );
@@ -25,8 +25,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   if (!firebaseUser || !profile) {
     return (
       <div className="mx-auto max-w-md p-8 text-center">
-        <h1 className="font-display text-2xl font-semibold text-ink">{t("adminSignInRequiredTitle")}</h1>
-        <p className="mt-2 text-sm text-muted">{t("adminSignInRequiredBody")}</p>
+        <h1 className="font-display text-2xl font-semibold text-adminNavy">{t("adminSignInRequiredTitle")}</h1>
+        <p className="mt-2 text-sm text-gray-500">{t("adminSignInRequiredBody")}</p>
         <Link href="/" className="mt-4 inline-block rounded bg-adminOrange px-4 py-2 text-sm font-semibold text-adminNavy">
           {t("adminGoToHomepage")}
         </Link>
@@ -37,8 +37,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   if (!STAFF_ROLES.includes(profile.role)) {
     return (
       <div className="mx-auto max-w-md p-8 text-center">
-        <h1 className="font-display text-2xl font-semibold text-ink">{t("adminNotAuthorizedTitle")}</h1>
-        <p className="mt-2 text-sm text-muted">
+        <h1 className="font-display text-2xl font-semibold text-adminNavy">{t("adminNotAuthorizedTitle")}</h1>
+        <p className="mt-2 text-sm text-gray-500">
           Your account role (<strong>{profile.role}</strong>) {t("adminNotAuthorizedBody")}
         </p>
       </div>
