@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useAuthUser } from "@/lib/hooks/useAuthUser";
+import RequireRole from "@/components/admin/RequireRole";
 import MediaUploader from "@/components/admin/MediaUploader";
 import MediaLibraryGrid, { type MediaItem } from "@/components/admin/MediaLibraryGrid";
 
@@ -25,6 +26,7 @@ export default function MediaLibraryPage() {
   }, [refetch]);
 
   return (
+    <RequireRole roles={["Editor", "Author"]}>
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
@@ -40,5 +42,6 @@ export default function MediaLibraryPage() {
         <MediaLibraryGrid items={items} onChanged={refetch} mode="manage" />
       )}
     </div>
+    </RequireRole>
   );
 }
