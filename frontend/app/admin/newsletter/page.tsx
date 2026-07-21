@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useAuthUser } from "@/lib/hooks/useAuthUser";
+import RequireRole from "@/components/admin/RequireRole";
 import { Trash2 } from "lucide-react";
 
 interface Subscriber {
@@ -40,6 +41,7 @@ export default function NewsletterPage() {
   const activeCount = subscribers.filter((s) => s.active).length;
 
   return (
+    <RequireRole roles={["Editor"]}>
     <div>
       <div className="mb-6">
         <h1 className="font-display text-2xl font-semibold text-ink">Newsletters</h1>
@@ -105,5 +107,6 @@ export default function NewsletterPage() {
         )}
       </div>
     </div>
+    </RequireRole>
   );
 }
