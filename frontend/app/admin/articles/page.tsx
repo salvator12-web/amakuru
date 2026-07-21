@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuthUser } from "@/lib/hooks/useAuthUser";
+import RequireRole from "@/components/admin/RequireRole";
 
 interface ArticleRow {
   _id: string;
@@ -49,6 +50,7 @@ export default function AdminArticlesPage() {
   }
 
   return (
+    <RequireRole roles={["Editor", "Author"]}>
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
@@ -117,5 +119,6 @@ export default function AdminArticlesPage() {
         </table>
       )}
     </div>
+    </RequireRole>
   );
 }
