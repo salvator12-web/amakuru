@@ -44,12 +44,12 @@ export default function EditArticlePage() {
   return (
     <RequireRole roles={["Editor", "Author"]}>
       {loading ? (
-        <p className="text-sm text-muted">Loading…</p>
+        <p className="text-sm text-gray-500">Loading…</p>
       ) : notFound || !initial ? (
         <p className="text-sm text-red-600">Article not found.</p>
       ) : (
         <div>
-          <h1 className="mb-6 font-display text-2xl font-semibold text-ink">Edit article</h1>
+          <h1 className="mb-6 font-display text-2xl font-semibold text-adminNavy">Edit article</h1>
           <ArticleForm initial={initial} />
         </div>
       )}
