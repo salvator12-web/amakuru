@@ -1,65 +1,90 @@
-# Amakuru — gap-closing plan
+# amakuru-backend
 
-Based on the actual code in `salvator12-web/amakuru` (cloned from `main`).
-Two groups below: **files to update** (described, not fully rewritten —
-they're small, targeted diffs) and **new files** (fully generated, included
-alongside this plan).
+Standalone Express/TypeScript API, split out of the Next.js app's `app/api/*`
+routes. Same MongoDB, same Firebase project, same Cloudinary account — just
+running as its own process instead of Next.js API routes.
 
----
+## Setup
 
-## 1. New files (generated in full)
+```bash
+npm install
+cp .env.example .env   # fill in MongoDB URI, Firebase Admin creds, Cloudinary keys
+npm run dev             # starts on :4000 (or $PORT), watches for changes
+```
 
-| File | What it does |
+`npm run build && npm start` for a production build.
+
+## Structure
+
+```
+src/
+  server.ts           Express app, mounts all routers, connects DB, listens
+  config/
+    db.ts             connectToDatabase() — mongoose connection
+    firebase.ts        Firebase Admin init, verifyIdToken()
+    cloudinary.ts      signed-upload helper (unchanged from the Next.js lib)
+  middleware/
+    auth.ts            authenticate / optionalAuthenticate / requireRole(...roles)
+  models/               all 12 Mongoose models, unchanged
+  routes/               one file per resource — see below
+  services/
+    push.ts, push-batch.ts, push-retry.ts     FCM sends (unchanged logic)
+    dispatch.ts, dispatch-batch.ts             in-app notification + push
+```
+
+## Route map
+
+Every route keeps the same path, method, and auth rules it had as a Next.js
+route handler — this is a lift-and-shift, not a redesign.
+
+| Path | File |
 |---|---|
-| `backend/src/models/AuditLog.ts` | New Mongoose model: `actor`, `action`, `targetType`, `targetId`, `meta`, `createdAt`. Generic so any staff action can be logged without a schema change. |
-| `backend/src/services/auditLog.ts` | `recordAuditLog()` helper — fire-and-forget write, never throws into the caller. Call it from route handlers after a mutation succeeds. |
-| `backend/src/routes/audit-log.ts` | `GET /api/audit-log` (Admin only, paginated, optional `?action=` filter). Feeds the existing "Coming soon" admin page. |
-| `backend/src/middleware/rateLimit.ts` | `apiLimiter` / `authLimiter` / `writeLimiter` built on `express-rate-limit`, keyed by user id when authenticated, IP otherwise. |
-| `frontend/components/admin/RichTextEditor.tsx` | Dependency-free `contentEditable` rich text editor (bold/italic/heading/quote/lists/link/undo-redo) — drop-in replacement for the body `<textarea>`. Emits the same HTML string `Article.body` already stores. |
+| `/api/ads`, `/api/ads/:id`, `/api/ads/:id/track` | `routes/ads.ts` |
+| `/api/articles`, `/api/articles/:id` | `routes/articles.ts` |
+| `/api/auth/sync` | `routes/auth.ts` |
+| `/api/bookmarks` | `routes/bookmarks.ts` |
+| `/api/categories`, `/api/categories/:id` | `routes/categories.ts` |
+| `/api/articles/:id/comments`, `/api/comments`, `/api/comments/:id` | `routes/comments.ts` |
+| `/api/media`, `/api/media/:id`, `/api/media/sign` | `routes/media.ts` |
+| `/api/newsletter` | `routes/newsletter.ts` |
+| `/api/notifications`, `/api/notifications/register-token` | `routes/notifications.ts` |
+| `/api/settings` | `routes/settings.ts` |
+| `/api/tags`, `/api/tags/:id` | `routes/tags.ts` |
 
----
+## What changed in the conversion (besides Next.js → Express plumbing)
 
-## 2. Files that need updates (described, not rewritten)
+- **`comments.ts` moderation queue** and **`notifications.ts` register-token
+  route** were broken in the original Next.js drop — they used default
+  imports (`import mongodb from ...`, `import Comment from ...`) that don't
+  match this codebase's actual named exports, and called `requireRole` with
+  a `{ok, message, status}` return shape that the real `requireRole` never
+  had. Neither file would have run as originally written. Both are fixed
+  here to use the real `connectToDatabase`/named model exports and the real
+  `authenticate`/`requireRole` middleware.
+- **Comment moderation model**: the moderation queue now defaults to
+  `?status=approved` (not `pending`), matching the fact that `POST
+  /api/articles/:id/comments` creates comments as `"approved"` immediately
+  — i.e. this is a post-then-moderate flow. See the comment at the top of
+  that handler in `routes/comments.ts` if you want to switch to
+  pre-moderation instead (create as `"pending"`, filter public reads to
+  `approved` only).
+- **Notification wiring**: comment replies and moderation actions
+  (approve/hide) now call `dispatchNotification` — this existed as a
+  service before but was never actually called from any route.
+- `POST /api/ads/:id` (create-or-track-event based on presence of `:id`)
+  split into `POST /api/ads` (create) and `POST /api/ads/:id/track` (record
+  impression/click) — Express doesn't overload a path by whether params are
+  present the way the Next.js file-based router implicitly did.
 
-### Backend
+## Auth
 
-- **`backend/package.json`**
-  Add `"express-rate-limit": "^7.4.1"` to `dependencies`. No other new deps needed — CSRF isn't actually applicable here (auth is `Authorization: Bearer <firebase-id-token>`, no cookies/sessions, so there's no ambient credential for a forged cross-site request to ride on). Worth stating explicitly in the README rather than leaving it as an open gap — the real gaps are rate limiting and audit logging, not CSRF.
+Unchanged: clients send `Authorization: Bearer <firebase-id-token>`. No
+cookies or sessions involved, so nothing about auth needed to change moving
+off Next.js.
 
-- **`backend/src/server.ts`**
-  - Import and mount `apiLimiter` globally (`app.use("/api", apiLimiter)`), `authLimiter` on `/api/auth`, `writeLimiter` on the two POST-heavy routers (`articlesRoutes`, `commentsRoutes`).
-  - Import and mount the new `audit-log` router: `app.use("/api/audit-log", auditLogRoutes)`.
+## Still open
 
-- **`backend/src/models/Article.ts`**
-  Add two optional fields to `IArticle` and the schema: `seoTitle?: string` (max ~70 chars) and `seoDescription?: string` (max ~160 chars). Fall back to `title`/`dek` on the frontend when empty rather than making them required.
-
-- **`backend/src/routes/articles.ts`**
-  - Extend `ArticleInput`/`ArticleUpdateInput` zod schemas with `seoTitle: z.string().max(70).optional()` and `seoDescription: z.string().max(160).optional()`.
-  - After a successful `POST /`, `PATCH /:id` (when status becomes `"published"`), and `DELETE /:id`, call `recordAuditLog({ actorId: String(req.user!._id), action: "article.create" | "article.publish" | "article.update" | "article.delete", targetType: "Article", targetId: String(article._id), meta: { slug: article.slug } })`.
-
-- **`backend/src/routes/comments.ts`**
-  After `PATCH /comments/:id` and `DELETE /comments/:id` succeed, call `recordAuditLog(...)` with `action: "comment.moderate"` / `"comment.delete"`.
-
-- **`backend/src/routes/users.ts`**
-  After `PATCH /:id/role` and `PATCH /:id/status` succeed, call `recordAuditLog(...)` with `action: "user.role_change"` / `"user.status_change"` and `meta: { from: <old value>, to: <new value> }` (fetch the doc before updating to capture `from`).
-
-### Frontend
-
-- **`frontend/components/admin/ArticleForm.tsx`**
-  - Replace the plain `<textarea>` bound to `values.body` with `<RichTextEditor value={values.body} onChange={(html) => setValues(v => ({...v, body: html}))} />`.
-  - Add two new fields under Dek: `SEO title` (text input, ~70-char counter) and `SEO description` (textarea, ~160-char counter), bound to `values.seoTitle` / `values.seoDescription`.
-  - Add a `scheduledFor` `datetime-local` input, shown only when `values.status === "scheduled"`; also add "Scheduled" as a third option next to the existing Save-draft / Save-&-publish buttons (currently the form only ever submits `"draft"` or `"published"` — `"scheduled"` exists in the model and zod schema but nothing in the UI can set it).
-  - Extend the local `ArticleFormValues` interface with `seoTitle?: string; seoDescription?: string;` (`scheduledFor` is already declared).
-
-- **`frontend/lib/types.ts`**
-  - Add `seoTitle?: string; seoDescription?: string;` to `ArticleDetail`.
-  - Add a new `AuditLogEntry` interface: `{ _id: string; actor: { name: string; email: string; avatarUrl?: string }; action: string; targetType: string; targetId: string; meta?: Record<string, unknown>; createdAt: string; }`.
-
-- **`frontend/app/admin/audit-log/page.tsx`**
-  Replace the "Coming soon" placeholder with a real client component: fetch `GET /api/audit-log` via `authedFetch`, render a paginated table (actor, action, target, when), matching the style of the existing `ModerationQueue.tsx` table.
-
----
-
-## 3. Confirmed (no code change needed, just documenting the answer)
-
-- **Comment moderation is post-then-moderate**, not pre-moderate: `POST /api/articles/:id/comments` creates comments with `status: "approved"` immediately (`routes/comments.ts`), and the public `GET` only ever returns `status: "approved"`. The moderation queue (`GET /api/comments`) defaults to `?status=approved` for the same reason — it's reviewing what's already live, not gatekeeping a pending queue. This is already documented in `backend/README.md`; flagging it here since it was one of the five original open questions.
+- The comment pre-moderation vs. post-moderation decision above is worth
+  confirming explicitly rather than leaving the default.
+- No rate limiting / CSRF / audit logging yet (tracked as a gap since the
+  original tech-stack doc).
