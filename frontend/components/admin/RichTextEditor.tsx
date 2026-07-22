@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 import {
   Bold,
   Italic,
@@ -42,6 +42,7 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
   const savedRange = useRef<Range | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const selectedImageRef = useRef<HTMLImageElement | null>(null);
 
   // Only push `value` into the DOM on first mount / when it changes from
   // outside (e.g. loading an existing article) — never on every keystroke,
@@ -119,6 +120,31 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
       selection.removeAllRanges();
       selection.addRange(savedRange.current);
     }
+  }
+
+  function handleEditorClick(e: MouseEvent<HTMLDivElement>) {
+    const target = e.target as HTMLElement;
+    if (selectedImageRef.current && selectedImageRef.current !== target) {
+      selectedImageRef.current.style.outline = "";
+    }
+    if (target.tagName === "IMG") {
+      const img = target as HTMLImageElement;
+      img.style.outline = "2px solid #f59e0b";
+      selectedImageRef.current = img;
+    } else {
+      selectedImageRef.current = null;
+    }
+  }
+
+  function setImageSize(widthPercent: string) {
+    const img = selectedImageRef.current;
+    if (!img) {
+      window.alert("Click an image first to select it, then choose a size.");
+      return;
+    }
+    img.style.width = `${widthPercent}%`;
+    img.style.height = "auto";
+    onChange(ref.current?.innerHTML || "");
   }
 
   async function handleImageFile(files: FileList | null) {
@@ -249,6 +275,23 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
           <option value="5">Large</option>
           <option value="7">Huge</option>
         </select>
+        <select
+          defaultValue=""
+          title="Image size (click an image first)"
+          onChange={(e) => {
+            if (e.target.value) setImageSize(e.target.value);
+            e.target.value = "";
+          }}
+          className="rounded border border-gray-200 bg-white px-1.5 py-1 text-xs text-gray-600 hover:bg-gray-100"
+        >
+          <option value="" disabled>
+            Img size
+          </option>
+          <option value="25">Small</option>
+          <option value="50">Medium</option>
+          <option value="75">Large</option>
+          <option value="100">Full</option>
+        </select>
         <label
           title="Text color"
           className="flex cursor-pointer items-center rounded p-1.5 hover:bg-gray-200"
@@ -268,6 +311,7 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
         suppressContentEditableWarning
         onInput={() => onChange(ref.current?.innerHTML || "")}
         onBlur={() => onChange(ref.current?.innerHTML || "")}
+        onClick={handleEditorClick}
         data-placeholder={placeholder}
         className="prose prose-sm min-h-[240px] max-w-none px-3 py-2 text-sm focus:outline-none empty:before:text-gray-400 empty:before:content-[attr(data-placeholder)]"
       />
