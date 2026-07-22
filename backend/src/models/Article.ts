@@ -27,6 +27,8 @@ export interface IArticle extends Document {
   shareCount: number;
   isBreaking: boolean;
   isFeatured: boolean; // hero slot on homepage
+  seoTitle?: string; // falls back to `title` on the frontend when empty
+  seoDescription?: string; // falls back to `dek` on the frontend when empty
   createdAt: Date;
   updatedAt: Date;
 }
@@ -55,6 +57,8 @@ const ArticleSchema = new Schema<IArticle>(
     shareCount: { type: Number, default: 0 },
     isBreaking: { type: Boolean, default: false },
     isFeatured: { type: Boolean, default: false },
+    seoTitle: { type: String, trim: true, maxlength: 70 },
+    seoDescription: { type: String, trim: true, maxlength: 160 },
   },
   { timestamps: true }
 );
