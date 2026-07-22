@@ -11,6 +11,7 @@ import {
   Quote,
   Undo,
   Redo,
+  Code,
 } from "lucide-react";
 
 interface RichTextEditorProps {
@@ -35,6 +36,7 @@ interface RichTextEditorProps {
 export default function RichTextEditor({ value, onChange, placeholder }: RichTextEditorProps) {
   const ref = useRef<HTMLDivElement>(null);
   const isFirstRender = useRef(true);
+  const savedRange = useRef<Range | null>(null);
 
   // Only push `value` into the DOM on first mount / when it changes from
   // outside (e.g. loading an existing article) — never on every keystroke,
@@ -58,11 +60,60 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
     if (url) exec("createLink", url);
   }
 
+  function toggleCode() {
+    // No native execCommand for inline code, so wrap/unwrap the current
+    // selection in a <code> element by hand.
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return;
+    ref.current?.focus();
+    const range = selection.getRangeAt(0);
+    const parent = range.commonAncestorContainer.parentElement;
+
+    if (parent?.tagName === "CODE") {
+      // Already code — unwrap it back to plain text.
+      const text = document.createTextNode(parent.textContent || "");
+      parent.replaceWith(text);
+    } else if (!range.collapsed) {
+      const code = document.createElement("code");
+      code.className = "rounded bg-gray-100 px-1 py-0.5 font-mono text-[0.85em]";
+      code.appendChild(range.extractContents());
+      range.insertNode(code);
+    }
+    onChange(ref.current?.innerHTML || "");
+  }
+
+  function setFontSize(size: string) {
+    // execCommand("fontSize") only accepts legacy values 1-7, mapped to
+    // <font size="N"> tags — still the simplest cross-browser way to do
+    // this without an editor library.
+    exec("fontSize", size);
+  }
+
+  function saveSelection() {
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0) {
+      savedRange.current = selection.getRangeAt(0);
+    }
+  }
+
+  function setTextColor(color: string) {
+    // Clicking the native <input type="color"> steals focus from the
+    // contentEditable, which clears the browser's text selection before
+    // this fires — so restore the range we captured on mousedown first.
+    const selection = window.getSelection();
+    if (selection && savedRange.current) {
+      selection.removeAllRanges();
+      selection.addRange(savedRange.current);
+    }
+    exec("foreColor", color);
+  }
+
   const buttons: { icon: typeof Bold; label: string; action: () => void }[] = [
     { icon: Bold, label: "Bold", action: () => exec("bold") },
     { icon: Italic, label: "Italic", action: () => exec("italic") },
     { icon: Heading2, label: "Heading", action: () => exec("formatBlock", "h2") },
     { icon: Quote, label: "Quote", action: () => exec("formatBlock", "blockquote") },
+    { icon: Code, label: "Code", action: toggleCode },
     { icon: List, label: "Bullet list", action: () => exec("insertUnorderedList") },
     { icon: ListOrdered, label: "Numbered list", action: () => exec("insertOrderedList") },
     { icon: LinkIcon, label: "Link", action: insertLink },
@@ -84,6 +135,43 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
             <Icon size={16} />
           </button>
         ))}
+        <select
+          defaultValue=""
+          title="Font size"
+          onMouseDown={saveSelection}
+          onChange={(e) => {
+            if (e.target.value) {
+              const selection = window.getSelection();
+              if (selection && savedRange.current) {
+                selection.removeAllRanges();
+                selection.addRange(savedRange.current);
+              }
+              setFontSize(e.target.value);
+            }
+            e.target.value = "";
+          }}
+          className="rounded border border-gray-200 bg-white px-1.5 py-1 text-xs text-gray-600 hover:bg-gray-100"
+        >
+          <option value="" disabled>
+            Size
+          </option>
+          <option value="2">Small</option>
+          <option value="3">Normal</option>
+          <option value="5">Large</option>
+          <option value="7">Huge</option>
+        </select>
+        <label
+          title="Text color"
+          className="flex cursor-pointer items-center rounded p-1.5 hover:bg-gray-200"
+        >
+          <input
+            type="color"
+            defaultValue="#000000"
+            onMouseDown={saveSelection}
+            onChange={(e) => setTextColor(e.target.value)}
+            className="h-4 w-4 cursor-pointer border-0 bg-transparent p-0"
+          />
+        </label>
       </div>
       <div
         ref={ref}
