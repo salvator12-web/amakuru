@@ -4,6 +4,7 @@ import { z } from "zod";
 import { Comment } from "../models/Comment";
 import { authenticate, requireRole, type AuthedRequest } from "../middleware/auth";
 import { dispatchNotification } from "../services/dispatch";
+import { recordAuditLog } from "../services/auditLog";
 
 const router = Router();
 
@@ -111,6 +112,14 @@ router.patch("/comments/:id", requireRole("Admin", "Editor", "Moderator"), async
     return res.status(404).json({ error: "Comment not found" });
   }
 
+  recordAuditLog({
+    actorId: String(req.user!._id),
+    action: "comment.moderate",
+    targetType: "Comment",
+    targetId: req.params.id,
+    meta: { status: parsed.data.status, article: String(comment.article) },
+  });
+
   if (parsed.data.status === "approved" || parsed.data.status === "hidden") {
     dispatchNotification({
       userId: String(comment.author),
@@ -139,6 +148,13 @@ router.delete("/comments/:id", authenticate, async (req: AuthedRequest, res: Res
 
   comment.status = "deleted";
   await comment.save();
+  recordAuditLog({
+    actorId: String(req.user!._id),
+    action: "comment.delete",
+    targetType: "Comment",
+    targetId: req.params.id,
+    meta: { article: String(comment.article), deletedBy: isOwner ? "author" : "moderator" },
+  });
   res.json({ success: true });
 });
 

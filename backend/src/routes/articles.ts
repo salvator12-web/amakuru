@@ -3,6 +3,7 @@ import { Router } from "express";
 import { z } from "zod";
 import { Article } from "../models/Article";
 import { requireRole, optionalAuthenticate, type AuthedRequest } from "../middleware/auth";
+import { recordAuditLog } from "../services/auditLog";
 
 const router = Router();
 
@@ -19,6 +20,8 @@ const ArticleInput = z.object({
   readTimeMinutes: z.number().int().positive().optional(),
   isBreaking: z.boolean().optional(),
   isFeatured: z.boolean().optional(),
+  seoTitle: z.string().max(70).optional(),
+  seoDescription: z.string().max(160).optional(),
 });
 const ArticleUpdateInput = ArticleInput.partial();
 
@@ -80,6 +83,13 @@ router.post("/", requireRole("Admin", "Editor", "Author"), async (req: AuthedReq
       status,
       author: req.user!._id,
       publishedAt: status === "published" ? new Date() : undefined,
+    });
+    recordAuditLog({
+      actorId: String(req.user!._id),
+      action: status === "published" ? "article.publish" : "article.create",
+      targetType: "Article",
+      targetId: String(article._id),
+      meta: { slug: article.slug, status },
     });
     res.status(201).json({ article });
   } catch (err: any) {
@@ -150,19 +160,35 @@ router.patch("/:id", requireRole("Admin", "Editor", "Author"), async (req: Authe
     updates.publishedAt = new Date();
   }
 
+  const wasPublished = article.status === "published";
   const updated = await Article.findByIdAndUpdate(req.params.id, updates, { new: true })
     .populate("category", "name slug colorDot")
     .populate("author", "name avatarUrl");
+
+  recordAuditLog({
+    actorId: String(req.user!._id),
+    action: !wasPublished && updated?.status === "published" ? "article.publish" : "article.update",
+    targetType: "Article",
+    targetId: req.params.id,
+    meta: { slug: updated?.slug, status: updated?.status },
+  });
 
   res.json({ article: updated });
 });
 
 // DELETE /api/articles/:id — Editor/Admin only
-router.delete("/:id", requireRole("Admin", "Editor"), async (req: Request, res: Response) => {
+router.delete("/:id", requireRole("Admin", "Editor"), async (req: AuthedRequest, res: Response) => {
   const deleted = await Article.findByIdAndDelete(req.params.id);
   if (!deleted) {
     return res.status(404).json({ error: "Article not found" });
   }
+  recordAuditLog({
+    actorId: String(req.user!._id),
+    action: "article.delete",
+    targetType: "Article",
+    targetId: req.params.id,
+    meta: { slug: deleted.slug },
+  });
   res.json({ success: true });
 });
 
