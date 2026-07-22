@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Bold,
   Italic,
@@ -12,7 +12,9 @@ import {
   Undo,
   Redo,
   Code,
+  Image as ImageIcon,
 } from "lucide-react";
+import { useAuthUser } from "@/lib/hooks/useAuthUser";
 
 interface RichTextEditorProps {
   value: string; // HTML — same string that used to live in the textarea
@@ -34,9 +36,12 @@ interface RichTextEditorProps {
  * the same way any HTML coming from a rich text editor should be.
  */
 export default function RichTextEditor({ value, onChange, placeholder }: RichTextEditorProps) {
+  const { authedFetch } = useAuthUser();
   const ref = useRef<HTMLDivElement>(null);
   const isFirstRender = useRef(true);
   const savedRange = useRef<Range | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   // Only push `value` into the DOM on first mount / when it changes from
   // outside (e.g. loading an existing article) — never on every keystroke,
@@ -108,6 +113,74 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
     exec("foreColor", color);
   }
 
+  function restoreSelection() {
+    const selection = window.getSelection();
+    if (selection && savedRange.current) {
+      selection.removeAllRanges();
+      selection.addRange(savedRange.current);
+    }
+  }
+
+  async function handleImageFile(files: FileList | null) {
+    const file = files?.[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    try {
+      // Same signed-upload flow as MediaUploader.tsx: get a Cloudinary
+      // signature from our backend, upload straight to Cloudinary, then
+      // register the resulting asset with our own /api/media route.
+      const signRes = await authedFetch("/api/media/sign", { method: "POST" });
+      if (!signRes.ok) throw new Error("Could not get an upload signature");
+      const sig = await signRes.json();
+
+      const form = new FormData();
+      form.append("file", file);
+      form.append("api_key", sig.apiKey);
+      form.append("timestamp", String(sig.timestamp));
+      form.append("signature", sig.signature);
+      form.append("folder", sig.folder);
+
+      const uploadRes = await fetch(sig.uploadUrl, { method: "POST", body: form });
+      if (!uploadRes.ok) throw new Error("Image upload failed");
+      const asset = await uploadRes.json();
+
+      authedFetch("/api/media", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          publicId: asset.public_id,
+          url: asset.url,
+          secureUrl: asset.secure_url,
+          type: "image",
+          format: asset.format,
+          width: asset.width,
+          height: asset.height,
+          bytes: asset.bytes,
+        }),
+      }).catch(() => {
+        // Non-fatal: the image still inserts into the article even if
+        // registering it in the media library fails.
+      });
+
+      // Insert at the cursor position — inline within whatever paragraph
+      // was focused, not appended to the end of the body.
+      ref.current?.focus();
+      restoreSelection();
+      document.execCommand(
+        "insertHTML",
+        false,
+        `<img src="${asset.secure_url}" alt="" style="max-width:100%" />`
+      );
+      onChange(ref.current?.innerHTML || "");
+    } catch (err) {
+      window.alert(err instanceof Error ? err.message : "Image upload failed");
+    } finally {
+      setUploadingImage(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
   const buttons: { icon: typeof Bold; label: string; action: () => void }[] = [
     { icon: Bold, label: "Bold", action: () => exec("bold") },
     { icon: Italic, label: "Italic", action: () => exec("italic") },
@@ -117,6 +190,14 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
     { icon: List, label: "Bullet list", action: () => exec("insertUnorderedList") },
     { icon: ListOrdered, label: "Numbered list", action: () => exec("insertOrderedList") },
     { icon: LinkIcon, label: "Link", action: insertLink },
+    {
+      icon: ImageIcon,
+      label: uploadingImage ? "Uploading…" : "Image",
+      action: () => {
+        saveSelection();
+        fileInputRef.current?.click();
+      },
+    },
     { icon: Undo, label: "Undo", action: () => exec("undo") },
     { icon: Redo, label: "Redo", action: () => exec("redo") },
   ];
@@ -129,12 +210,20 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
             key={label}
             type="button"
             title={label}
+            disabled={label === "Uploading…"}
             onClick={action}
-            className="rounded p-1.5 text-gray-600 hover:bg-gray-200"
+            className="rounded p-1.5 text-gray-600 hover:bg-gray-200 disabled:opacity-50"
           >
             <Icon size={16} />
           </button>
         ))}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          hidden
+          onChange={(e) => handleImageFile(e.target.files)}
+        />
         <select
           defaultValue=""
           title="Font size"
