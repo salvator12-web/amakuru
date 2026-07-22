@@ -43,6 +43,8 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
   const selectedImageRef = useRef<HTMLImageElement | null>(null);
+  const [imgWidthInput, setImgWidthInput] = useState("");
+  const [imgHeightInput, setImgHeightInput] = useState("");
 
   // Only push `value` into the DOM on first mount / when it changes from
   // outside (e.g. loading an existing article) — never on every keystroke,
@@ -131,8 +133,12 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
       const img = target as HTMLImageElement;
       img.style.outline = "2px solid #f59e0b";
       selectedImageRef.current = img;
+      setImgWidthInput(String(Math.round(img.getBoundingClientRect().width)));
+      setImgHeightInput(String(Math.round(img.getBoundingClientRect().height)));
     } else {
       selectedImageRef.current = null;
+      setImgWidthInput("");
+      setImgHeightInput("");
     }
   }
 
@@ -144,6 +150,16 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
     }
     img.style.width = `${widthPercent}%`;
     img.style.height = "auto";
+    setImgWidthInput(String(Math.round(img.getBoundingClientRect().width)));
+    setImgHeightInput(String(Math.round(img.getBoundingClientRect().height)));
+    onChange(ref.current?.innerHTML || "");
+  }
+
+  function applyImagePixelSize() {
+    const img = selectedImageRef.current;
+    if (!img) return; // nothing selected — fields are empty in this state, so silently no-op
+    img.style.width = imgWidthInput ? `${imgWidthInput}px` : "auto";
+    img.style.height = imgHeightInput ? `${imgHeightInput}px` : "auto";
     onChange(ref.current?.innerHTML || "");
   }
 
@@ -292,6 +308,35 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
           <option value="75">Large</option>
           <option value="100">Full</option>
         </select>
+        <div className="flex items-center gap-1">
+          <input
+            type="number"
+            min={1}
+            placeholder="W px"
+            title="Image width in pixels"
+            value={imgWidthInput}
+            onChange={(e) => setImgWidthInput(e.target.value)}
+            onBlur={applyImagePixelSize}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") applyImagePixelSize();
+            }}
+            className="w-16 rounded border border-gray-200 bg-white px-1.5 py-1 text-xs text-gray-600"
+          />
+          <span className="text-xs text-gray-400">×</span>
+          <input
+            type="number"
+            min={1}
+            placeholder="H px"
+            title="Image height in pixels"
+            value={imgHeightInput}
+            onChange={(e) => setImgHeightInput(e.target.value)}
+            onBlur={applyImagePixelSize}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") applyImagePixelSize();
+            }}
+            className="w-16 rounded border border-gray-200 bg-white px-1.5 py-1 text-xs text-gray-600"
+          />
+        </div>
         <label
           title="Text color"
           className="flex cursor-pointer items-center rounded p-1.5 hover:bg-gray-200"
