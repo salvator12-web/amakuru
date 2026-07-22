@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import LanguageProvider from "@/lib/i18n/LanguageProvider";
+import { AuthUserProvider } from "@/lib/hooks/useAuthUser";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -18,6 +19,13 @@ export const metadata: Metadata = {
  * and no <html>/<body> tags), so every prerendered page — including
  * _not-found — crashed.
  *
+ * AuthUserProvider is mounted here too, once, so every page shares a
+ * single Firebase auth listener and a single /api/auth/sync call instead
+ * of each admin page re-deriving its own — that duplication used to cause
+ * a transient "Not authorized" flash for legitimately signed-in Admins on
+ * whichever page's independent listener happened to catch Firebase's
+ * initial null-before-resolved auth state.
+ *
  * app/admin/layout.tsx is unaffected by this file and keeps its own
  * separate admin-shell logic (sidebar nav, staff-role gate, sign out).
  */
@@ -25,7 +33,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
-        <LanguageProvider>{children}</LanguageProvider>
+        <LanguageProvider>
+          <AuthUserProvider>{children}</AuthUserProvider>
+        </LanguageProvider>
       </body>
     </html>
   );
