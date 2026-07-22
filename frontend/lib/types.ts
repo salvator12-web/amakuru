@@ -43,4 +43,16 @@ export interface ArticleSummary {
 export interface ArticleDetail extends ArticleSummary {
   body: string;
   tags?: { _id: string; name: string; slug: string }[];
+  seoTitle?: string;
+  seoDescription?: string;
+}
+
+export interface AuditLogEntry {
+  _id: string;
+  actor: { name: string; email: string; avatarUrl?: string };
+  action: string;
+  targetType: string;
+  targetId: string;
+  meta?: Record<string, unknown>;
+  createdAt: string;
 }
