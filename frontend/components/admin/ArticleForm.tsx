@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuthUser } from "@/lib/hooks/useAuthUser";
 import { apiUrl } from "@/lib/api";
 import CoverImagePicker from "@/components/admin/CoverImagePicker";
+import RichTextEditor from "@/components/admin/RichTextEditor";
 import type { MediaItem } from "@/components/admin/MediaLibraryGrid";
 
 interface Category {
@@ -31,6 +32,8 @@ export interface ArticleFormValues {
   scheduledFor?: string;
   isBreaking: boolean;
   isFeatured: boolean;
+  seoTitle?: string;
+  seoDescription?: string;
 }
 
 const EMPTY_FORM: ArticleFormValues = {
@@ -44,6 +47,8 @@ const EMPTY_FORM: ArticleFormValues = {
   status: "draft",
   isBreaking: false,
   isFeatured: false,
+  seoTitle: "",
+  seoDescription: "",
 };
 
 function slugify(text: string): string {
@@ -165,14 +170,39 @@ export default function ArticleForm({ initial }: ArticleFormProps) {
 
       <div>
         <label className="mb-1 block text-sm font-medium text-adminNavy">Body</label>
-        <textarea
-          required
-          rows={12}
+        <RichTextEditor
           value={values.body}
-          onChange={(e) => setValues((v) => ({ ...v, body: e.target.value }))}
-          className="w-full rounded border border-gray-200 px-3 py-2 font-mono text-sm"
-          placeholder="HTML or Markdown — rendered on the public site"
+          onChange={(html) => setValues((v) => ({ ...v, body: html }))}
+          placeholder="Write the article…"
         />
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 border-t border-gray-200 pt-5 sm:grid-cols-2">
+        <div>
+          <label className="mb-1 block text-sm font-medium text-adminNavy">
+            SEO title <span className="text-gray-400">({(values.seoTitle || "").length}/70)</span>
+          </label>
+          <input
+            maxLength={70}
+            value={values.seoTitle || ""}
+            onChange={(e) => setValues((v) => ({ ...v, seoTitle: e.target.value }))}
+            placeholder={values.title || "Falls back to Title"}
+            className="w-full rounded border border-gray-200 px-3 py-2 text-sm"
+          />
+        </div>
+        <div>
+          <label className="mb-1 block text-sm font-medium text-adminNavy">
+            SEO description <span className="text-gray-400">({(values.seoDescription || "").length}/160)</span>
+          </label>
+          <textarea
+            rows={2}
+            maxLength={160}
+            value={values.seoDescription || ""}
+            onChange={(e) => setValues((v) => ({ ...v, seoDescription: e.target.value }))}
+            placeholder={values.dek || "Falls back to Dek"}
+            className="w-full rounded border border-gray-200 px-3 py-2 text-sm"
+          />
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
@@ -257,7 +287,25 @@ export default function ArticleForm({ initial }: ArticleFormProps) {
         </label>
       </div>
 
-      <div className="flex items-center gap-3 border-t border-gray-200 pt-5">
+      <div className="flex flex-wrap items-end gap-3 border-t border-gray-200 pt-5">
+        <div>
+          <label className="mb-1 block text-sm font-medium text-adminNavy">Schedule for</label>
+          <input
+            type="datetime-local"
+            value={values.scheduledFor ? values.scheduledFor.slice(0, 16) : ""}
+            onChange={(e) =>
+              setValues((v) => ({
+                ...v,
+                scheduledFor: e.target.value ? new Date(e.target.value).toISOString() : undefined,
+              }))
+            }
+            className="rounded border border-gray-200 px-3 py-2 text-sm"
+          />
+          <p className="mt-1 text-xs text-gray-500">
+            Leave blank to save as a draft or publish immediately below.
+          </p>
+        </div>
+
         <button
           type="submit"
           disabled={saving}
@@ -267,14 +315,25 @@ export default function ArticleForm({ initial }: ArticleFormProps) {
         </button>
 
         {isStaff && (
-          <button
-            type="button"
-            disabled={saving}
-            onClick={(e) => handleSubmit(e, "published")}
-            className="rounded bg-adminOrange px-4 py-2 text-sm font-semibold text-adminNavy hover:bg-adminOrange-dark disabled:opacity-50"
-          >
-            Save &amp; publish
-          </button>
+          <>
+            <button
+              type="button"
+              disabled={saving}
+              onClick={(e) => handleSubmit(e, "published")}
+              className="rounded bg-adminOrange px-4 py-2 text-sm font-semibold text-adminNavy hover:bg-adminOrange-dark disabled:opacity-50"
+            >
+              Save &amp; publish
+            </button>
+            <button
+              type="button"
+              disabled={saving || !values.scheduledFor}
+              onClick={(e) => handleSubmit(e, "scheduled")}
+              title={!values.scheduledFor ? "Pick a date/time above first" : undefined}
+              className="rounded border border-adminOrange px-4 py-2 text-sm font-semibold text-adminOrange-dark disabled:opacity-40"
+            >
+              Schedule
+            </button>
+          </>
         )}
 
         {!isStaff && (
