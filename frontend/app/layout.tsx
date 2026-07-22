@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AuthUserProvider } from "@/lib/hooks/useAuthUser";
+import LanguageProvider from "@/lib/i18n/LanguageProvider";
 
 export const metadata: Metadata = {
   title: "Amakuru",
@@ -11,7 +12,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
-        <AuthUserProvider>{children}</AuthUserProvider>
+        <LanguageProvider>
+          <AuthUserProvider>{children}</AuthUserProvider>
+        </LanguageProvider>
       </body>
     </html>
   );
