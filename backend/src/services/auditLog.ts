@@ -1,46 +1,37 @@
-import { Schema, model, models, type Document, type Model } from "mongoose";
+import { AuditLog, type AuditAction } from "../models/AuditLog";
 
-/**
- * One row per staff action worth being able to answer "who did this, and
- * when" about later: publishing/deleting an article, moderating a
- * comment, changing a user's role or status, etc. Deliberately generic
- * (action + targetType + targetId + a free-form `meta` bag) rather than
- * one collection per resource, so new actions don't need a schema change —
- * just call recordAuditLog() from services/auditLog.ts with a new
- * `action` string.
- */
-export type AuditAction =
-  | "article.create"
-  | "article.update"
-  | "article.publish"
-  | "article.delete"
-  | "comment.moderate"
-  | "comment.delete"
-  | "user.role_change"
-  | "user.status_change";
-
-export interface IAuditLog extends Document {
-  actor: Schema.Types.ObjectId; // ref User — who performed the action
+interface RecordAuditLogInput {
+  actorId: string;
   action: AuditAction;
-  targetType: string; // "Article" | "Comment" | "User" ...
-  targetId: Schema.Types.ObjectId;
-  meta?: Record<string, unknown>; // e.g. { from: "draft", to: "published" }
-  createdAt: Date;
+  targetType: string;
+  targetId: string;
+  meta?: Record<string, unknown>;
 }
 
-const AuditLogSchema = new Schema<IAuditLog>(
-  {
-    actor: { type: Schema.Types.ObjectId, ref: "User", required: true, index: true },
-    action: { type: String, required: true, index: true },
-    targetType: { type: String, required: true },
-    targetId: { type: Schema.Types.ObjectId, required: true, index: true },
-    meta: { type: Schema.Types.Mixed },
-  },
-  { timestamps: { createdAt: true, updatedAt: false } }
-);
-
-// Audit-log page reads newest-first; this is the only query pattern it has.
-AuditLogSchema.index({ createdAt: -1 });
-
-export const AuditLog: Model<IAuditLog> =
-  models.AuditLog || model<IAuditLog>("AuditLog", AuditLogSchema);
+/**
+ * Fire-and-forget audit write. Deliberately never throws into the caller —
+ * a failed audit write shouldn't fail the underlying request (publishing
+ * an article shouldn't 500 because the audit collection had a hiccup).
+ * Call this from route handlers right after the mutation succeeds, e.g.:
+ *
+ *   await recordAuditLog({
+ *     actorId: String(req.user!._id),
+ *     action: "article.publish",
+ *     targetType: "Article",
+ *     targetId: String(article._id),
+ *     meta: { slug: article.slug },
+ *   });
+ */
+export async function recordAuditLog(input: RecordAuditLogInput): Promise<void> {
+  try {
+    await AuditLog.create({
+      actor: input.actorId,
+      action: input.action,
+      targetType: input.targetType,
+      targetId: input.targetId,
+      meta: input.meta,
+    });
+  } catch (err) {
+    console.error("[audit-log] failed to record entry:", input.action, err);
+  }
+}
