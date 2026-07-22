@@ -5,6 +5,7 @@ import "express-async-errors"; // lets async route handler rejections reach the 
 import { connectToDatabase } from "./config/db";
 import adsRoutes from "./routes/ads";
 import articlesRoutes from "./routes/articles";
+import auditLogRoutes from "./routes/audit-log";
 import authRoutes from "./routes/auth";
 import bookmarksRoutes from "./routes/bookmarks";
 import categoriesRoutes from "./routes/categories";
@@ -15,16 +16,19 @@ import notificationsRoutes from "./routes/notifications";
 import settingsRoutes from "./routes/settings";
 import tagsRoutes from "./routes/tags";
 import usersRoutes from "./routes/users";
+import { apiLimiter, authLimiter, writeLimiter } from "./middleware/rateLimit";
 const app = express();
 app.use(cors({ origin: process.env.FRONTEND_ORIGIN?.split(",") ?? "*" }));
 app.use(express.json());
 app.get("/health", (_req, res) => res.json({ ok: true }));
+app.use("/api", apiLimiter); // global default; tighter limiters below override per-route
 app.use("/api/ads", adsRoutes);
-app.use("/api/articles", articlesRoutes);
-app.use("/api/auth", authRoutes);
+app.use("/api/articles", writeLimiter, articlesRoutes);
+app.use("/api/audit-log", auditLogRoutes);
+app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/bookmarks", bookmarksRoutes);
 app.use("/api/categories", categoriesRoutes);
-app.use("/api", commentsRoutes); // -> /api/articles/:id/comments, /api/comments, /api/comments/:id
+app.use("/api", writeLimiter, commentsRoutes); // -> /api/articles/:id/comments, /api/comments, /api/comments/:id
 app.use("/api/media", mediaRoutes);
 app.use("/api/newsletter", newsletterRoutes);
 app.use("/api/notifications", notificationsRoutes);
